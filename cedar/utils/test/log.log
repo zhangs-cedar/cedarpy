@@ -1,1 +1,20 @@
-[2024/04/12 15:23:45] cedar.utils.logger INFO: 151231
+[2024/04/12 15:40:33] cedar.utils.logger INFO: 151231
+[2024/04/12 15:40:47] cedar.utils.logger INFO: 151231
+[2024/04/12 15:40:47] cedar.utils.logger INFO: 1512214
+[2024/04/12 15:41:00] cedar.utils.logger INFO: 151231
+[2024/04/12 15:41:00] cedar.utils.logger INFO: 1512214
+[2024/04/12 15:41:06] cedar.utils.logger INFO: 151231
+[2024/04/12 15:41:06] cedar.utils.logger INFO: 1512214
+[2024/04/12 15:41:21] cedar.utils.logger INFO: 151231
+[2024/04/12 15:41:21] cedar.utils.logger INFO: 1512214
+[2024/04/12 15:43:43] 测试 INFO: 151231
+[2024/04/12 15:43:43] 测试 INFO: 1512214
+[2024/04/12 15:49:02] 测试 WARNING: Initialize logger
+[2024/04/12 15:49:02] 测试 INFO: 151231
+[2024/04/12 15:49:02] 测试 INFO: 1512214
+2024/04/12 15:52:38 - logger.py[line:37] - WARNING: Initialize logger
+2024/04/12 15:52:38 - logger.py[line:41] - INFO: 151231
+2024/04/12 15:52:38 - logger.py[line:41] - INFO: 1512214
+[2024/04/12 16:09:12] 测试 WARNING: Initialize logger
+[2024/04/12 16:09:12] 测试 INFO: 151231
+[2024/04/12 16:09:12] 测试 INFO: 1512214

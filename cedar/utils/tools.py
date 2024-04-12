@@ -1,10 +1,15 @@
-import logging
 import os
 import os.path as osp
 import shutil
 import time
+import datetime
 import traceback
 from functools import wraps
+
+
+def create_name():
+    strtime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")  # 格式化日期时间，年月日时分秒毫秒
+    return strtime
 
 
 def split_filename(filename: str) -> tuple:
@@ -47,10 +52,10 @@ def timeit(func):
         start = time.time()
         try:
             res = func(*args, **kwargs)
-            logging.info("[Method {}], FINISH Time {} s: \n".format(func.__name__, round((time.time() - start), 4)))
+            print("[Method {}], FINISH Time {} s: \n".format(func.__name__, round((time.time() - start), 4)))
             return res
         except:
-            logging.error(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
+            print(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
             exit(0)
 
     return decorated

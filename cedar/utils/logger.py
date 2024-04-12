@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-
+from cedar.utils.tools import create_name
 
 _logger = None
 
@@ -26,13 +26,15 @@ def init_logger(name=__name__, log_file=None, log_level=logging.INFO):
     stream_handler = logging.StreamHandler(stream=sys.stdout)
     stream_handler.setFormatter(formatter)
     _logger.addHandler(stream_handler)
-    if log_file is not None:
-        log_file_folder = os.path.split(log_file)[0]
-        os.makedirs(log_file_folder, exist_ok=True)
-        file_handler = logging.FileHandler(log_file, "a")
-        file_handler.setFormatter(formatter)
-        _logger.addHandler(file_handler)
+    if log_file is None:
+        log_file = "./{}.log".format(create_name())
+    log_file_folder = os.path.split(log_file)[0]
+    os.makedirs(log_file_folder, exist_ok=True)
+    file_handler = logging.FileHandler(log_file, "a")
+    file_handler.setFormatter(formatter)
+    _logger.addHandler(file_handler)
     _logger.setLevel(log_level)
+    _logger.warning("Initialize logger")
 
 
 def info(fmt, *args):
