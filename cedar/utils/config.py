@@ -1,48 +1,42 @@
 import yaml
-
+import json
+import os
 from cedar.utils.dict2obj import Dict2Obj
 
 
-class ConfigYaml:
-    """配置项的值是否存在,如果配置不存在,返回defval
-
-    Example:
-        >>> config = ConfigYaml(osp.join(base_dir, config_file))
-        >>> print(config._cache)
-        >>> {'A': {'B': '1'}}
-        >>> print(config.get_config("A.B", defval="0"))
-        >>> '1'
-    """
-
+class Config:
     def __init__(self, config_path):
         """初始化配置类."""
-        self.json = self.load_yaml(config_path)  # 加载YAML文件
-        self.obj = self.to_obj(self.json)  # 将字典转换为对象
-        print("YAML文件加载解析成功！\npath: {} \nyaml: {}".format(config_path, self.json))
+        self.json = self.load(config_path)  # 加载YAML文件
+        self.obj = Dict2Obj(self.json)  # 将字典转换为对象
+        print("配置文件加载解析成功！\npath: {} \n {}".format(config_path, self.json))
 
-    def load_yaml(self, path):
-        """
-        加载YAML文件并解析为Python字典。
+    def load(self, path):
+        """根据文件路径的扩展名来判断是加载 YAML 还是 JSON 文件"""
+        _, extension = os.path.splitext(path)
+        if extension == ".yaml" or extension == ".yml":
+            return self.read_yaml(path)
+        elif extension == ".json":
+            return self.read_json(path)
+        else:
+            raise ValueError("Unsupported file format: {}".format(extension))
 
-        参数：
-        - path：YAML文件的路径
-
-        返回：
-        - json：解析后的Python字典
-        """
+    @staticmethod
+    def read_yaml(path):
+        """ """
         with open(path, encoding="utf-8") as file:
             json = yaml.safe_load(file)  # 加载YAML数据
         return json
 
-    def to_obj(self, json):
-        """
-        将Python字典转换为对象。
+    # 读取 JSON 文件
+    @staticmethod
+    def read_json(file_path):
+        with open(file_path, "r") as file:
+            data = json.load(file)
+        return data
 
-        参数：
-        - json：Python字典
-
-        返回：
-        - obj：转换后的对象
-        """
-        obj = Dict2Obj(json)  # 将字典转换为对象
-        return obj
+    # 修改 JSON 文件
+    @staticmethod
+    def write_json(data, file_path):
+        with open(file_path, "w") as file:
+            json.dump(data, file, indent=4)
