@@ -7,24 +7,19 @@ from cedar.draw import color_list
 
 def putText(img, text, position, textColor=tuple(color_list[0]), textSize=30):
     """
-    Add text to an image.
-
-    Parameters:
-    - img: numpy.ndarray or PIL.Image.Image
-        The input image.
-    - text: str
-        The text to be added.
-    - position: tuple (x, y)
-        The position (top-left corner) where the text will be added.
-    - textColor: tuple (B, G, R), optional
-        The color of the text. Default is green (0, 255, 0).
-    - textSize: int, optional
-        The font size of the text. Default is 30.
-
+    在图像上添加文字。
+    
+    Args:
+        img (numpy.ndarray or PIL.Image.Image): 输入图像。
+        text (str): 要添加的文字。
+        position (tuple (x, y)): 文字添加的位置（左上角坐标）。
+        textColor (tuple (B, G, R), optional): 文字的颜色。默认为绿色（0, 255, 0）。
+        textSize (int, optional): 文字的字体大小。默认为30。
+    
     Returns:
-    - numpy.ndarray
-        The image with the added text.
+        numpy.ndarray: 添加了文字的图像。
     """
+
     if isinstance(img, np.ndarray):  # Check if the input image is an OpenCV image
         img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 
