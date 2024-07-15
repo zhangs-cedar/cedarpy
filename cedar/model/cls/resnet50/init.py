@@ -16,7 +16,7 @@ from torchvision import transforms as T
 import warnings
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score
- 
+
 warnings.filterwarnings("ignore")
 
 
@@ -24,16 +24,16 @@ def get_encoding(path):
     """
     获取文件编码。
     """
-    f = open(path, 'rb')
+    f = open(path, "rb")
     data = f.read()
-    file_encoding = chardet.detect(data).get('encoding')
+    file_encoding = chardet.detect(data).get("encoding")
     f.close()
     return file_encoding
 
 
 def path_normalization(path: str):
     """
-    对路径进行标准化处理，将路径中的斜杠符号（/）或反斜杠符号（\）统一成当前操作系统所支持的路径分隔符。    
+    对路径进行标准化处理，将路径中的斜杠符号（/）或反斜杠符号（\）统一成当前操作系统所支持的路径分隔符。
     """
     win_sep = "\\"
     other_sep = "/"

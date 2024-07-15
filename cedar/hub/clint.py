@@ -37,8 +37,8 @@ class ModelClient:
             images = [images]
         print(images)
         files = {}
-        for index,image_file in enumerate(images):
-            files[str(index)+".jpg"] = (str(index)+".jpg", self._prepare_image(image_file))
+        for index, image_file in enumerate(images):
+            files[str(index) + ".jpg"] = (str(index) + ".jpg", self._prepare_image(image_file))
         response = requests.post(f"{self.server_url}/predict", files=files)
         if response.status_code == 200:
             return eval(response.json())

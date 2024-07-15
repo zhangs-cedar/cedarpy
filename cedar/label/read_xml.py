@@ -40,10 +40,6 @@ def xml_to_dict(element):
     return result
 
 
-# 从文件中读取XML
-xml_file = "/workspace/project/Track2-CrowdCountingTask/temp/GAIIC2024-赛道2-人群计数任务/train/labels/1R.xml"
-
-
 def read_xml(file):
     """
     从给定的XML文件中读取XML内容并返回其根节点。
