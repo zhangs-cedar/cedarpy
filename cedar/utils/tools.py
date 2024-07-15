@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 import shutil
+import hashlib
 import time
 import datetime
 import traceback
@@ -76,3 +77,75 @@ def run_subprocess(cmd, cwd=None):
     # 读取输出和错误，避免潜在的死锁
     stdout, stderr = process.communicate()
     return process, stdout, stderr
+
+
+def get_file_md5(filename):
+    """
+    计算指定文件的MD5哈希值。
+
+    参数:
+    - filename: 文件的路径。
+
+    返回:
+    - 文件的MD5哈希值，以十六进制字符串形式。
+    """
+    hash_md5 = hashlib.md5()
+    with open(filename, "rb") as f:  # 以二进制形式读取文件
+        for chunk in iter(lambda: f.read(4096), b""):  # 按块读取文件
+            hash_md5.update(chunk)  # 更新MD5哈希值
+    return hash_md5.hexdigest()  # 返回十六进制形式的哈希值
+
+
+def find_duplicate_filenames(directory):
+    """
+    在指定目录下搜索重复的文件名，并返回这些文件名列表。
+
+    Args:
+        directory (str): 需要搜索的目录路径。
+
+    Returns:
+        list: 包含重复文件名的列表，列表中的元素是字符串类型。
+
+    """
+    filename_counts = {}
+    for root, dirs, files in os.walk(directory):
+        for filename in files:
+            if filename in filename_counts:
+                filename_counts[filename] += 1
+            else:
+                filename_counts[filename] = 1
+    duplicates = [f for f, count in filename_counts.items() if count > 1]
+    return duplicates
+
+
+def move_file(src_path, dst_dir, filename=None):
+    """
+    将文件从源路径移动到目标目录，并可选择性地重命名文件。
+
+    Args:
+        src_path (str): 源文件的路径。
+        dst_dir (str): 目标目录的路径。
+        filename (str, optional): 可选的文件名，如果提供，则将源文件重命名为该名称。
+            默认为None，表示使用源文件的原始文件名。
+
+    Returns:
+        None
+
+    Raises:
+        FileNotFoundError: 如果源文件不存在，则引发此异常。
+        PermissionError: 如果用户没有足够的权限来移动文件或创建目录，则可能引发此异常。
+        其他可能的异常: 调用os和shutil模块时可能引发的其他异常。
+
+    """
+    # 如果没有提供文件名，则使用源文件的文件名
+    if filename is None:
+        filename = os.path.basename(src_path)
+    # 确保目标目录存在
+    os.makedirs(dst_dir, exist_ok=True)
+    # 目标文件的完整路径
+    dst_path = os.path.join(dst_dir, filename)
+    # 如果目标目录中存在同名文件，则删除它
+    if os.path.exists(dst_path):
+        os.remove(dst_path)
+    # 移动文件
+    shutil.move(src_path, dst_path)
