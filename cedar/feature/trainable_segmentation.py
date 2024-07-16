@@ -1,10 +1,9 @@
-import logging
 import os
-from xml.etree import ElementTree as et
-
+import logging
 import cv2
 import joblib
 import numpy as np
+from xml.etree import ElementTree as et
 from cedar.utils import split_filename
 
 

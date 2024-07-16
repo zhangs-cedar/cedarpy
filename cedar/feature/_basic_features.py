@@ -1,9 +1,10 @@
 import itertools
+import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from itertools import combinations_with_replacement
 
-import numpy as np
+
 from skimage import feature, filters
 from skimage.util.dtype import img_as_float32
 

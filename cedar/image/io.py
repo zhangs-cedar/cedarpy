@@ -3,7 +3,7 @@ import base64
 
 from PIL import Image
 from io import BytesIO
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 
 def array_to_base64(image_array):
@@ -38,3 +38,17 @@ def path_to_url(file_path):
     # 修复任何可能的编码问题，如将 %252F 转换为单个 /
     url = url.replace("%252F", "%2F")
     return url
+
+
+def url_to_path(encoded_url):
+    """
+    将编码后的 URL 转换回本地文件路径。
+    """
+    # 从 URL 中移除 file:/// 前缀
+    if encoded_url.startswith("file:///"):
+        encoded_path = encoded_url[8:]
+    else:
+        raise ValueError("提供的 URL 不是有效的 file URL")
+    decoded_path = unquote(encoded_path)
+    local_path = decoded_path.replace("/", "\\")
+    return local_path
