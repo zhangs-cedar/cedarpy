@@ -1,9 +1,10 @@
 import setuptools
 
+__version__ = "0.0.6"
 
 setuptools.setup(
     name="cedar",  # 模块名称
-    version="0.0.6",  # 当前版本
+    version=__version__,  # 当前版本
     author="zhangsong",  # 作者
     author_email="",  # 作者邮箱
     description="",  # 模块简介ma
