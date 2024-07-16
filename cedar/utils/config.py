@@ -12,7 +12,6 @@ class Config:
         # 输出配置文件的加载路径，但不输出具体的配置内容
         print("配置文件加载解析成功！\npath: {}".format(config_path))
 
-
     def load(self, path):
         """根据文件路径的扩展名来判断是加载 YAML 还是 JSON 文件"""
         _, extension = os.path.splitext(path)
