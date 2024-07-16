@@ -30,7 +30,7 @@ def init_logger(name=__name__, log_file=None, log_level=logging.INFO):
         log_file = "./{}.log".format(create_name())
     log_file_folder = os.path.split(log_file)[0]
     os.makedirs(log_file_folder, exist_ok=True)
-    file_handler = logging.FileHandler(log_file, "a")
+    file_handler = logging.FileHandler(log_file, encoding="utf8")
     file_handler.setFormatter(formatter)
     _logger.addHandler(file_handler)
     _logger.setLevel(log_level)
