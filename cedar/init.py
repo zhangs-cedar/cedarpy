@@ -24,6 +24,7 @@ from cedar.label import *
 
 
 alt.data_transformers.enable("vegafusion")
+alt.renderers.enable("mimetype")
 warnings.filterwarnings("ignore")
 # 打印已经加载的包
 print(f"loaded packages: {[name for name in globals() if not name.startswith('_')]}")
