@@ -1,9 +1,20 @@
 import cv2
 import base64
-
+import os.path as osp
 from PIL import Image
 from io import BytesIO
 from urllib.parse import quote, unquote
+
+
+def find_image_path(file_path, name, extensions=[".png", ".bmp", ".jpg"]):
+    """
+    在给定文件路径的同一目录下，根据文件名和扩展名列表查找图片文件的完整路径。
+    """
+    for ext in extensions:
+        img_path = osp.join(osp.dirname(file_path), f"{name}{ext}")
+        if osp.exists(img_path):
+            return img_path
+    return None
 
 
 def array_to_base64(image_array):
