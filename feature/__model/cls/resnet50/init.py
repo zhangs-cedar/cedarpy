@@ -16,6 +16,7 @@ from torchvision import transforms as T
 import warnings
 from tqdm import tqdm
 from sklearn.metrics import accuracy_score
+from cedar.init import *
 
 warnings.filterwarnings("ignore")
 
