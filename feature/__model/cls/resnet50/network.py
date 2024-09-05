@@ -67,7 +67,7 @@ class MultiFeatureNet(nn.Module):
             output = self.forward(input, feature)
             _, pred = torch.max(output, dim=1)
             loss = criterion(pred.to(dtype=torch.float32), label.squeeze(1).to(dtype=torch.float32))
-            
+
             loss.backward()
             optimizer.step()
             loss_sum += float(loss.item())  # 简化了 loss 的处理
@@ -195,7 +195,7 @@ def test_02():
             sample_image = np.random.randn(3, 256, 256).astype(np.float32)
             sample_feature = np.random.randn(72).astype(np.float32)
             sample_label = np.array([1], dtype=np.float32)
-            
+
             sample = {"image": copy.deepcopy(sample_image), "feature": copy.deepcopy(sample_feature), "label": copy.deepcopy(sample_label)}
             return sample
 

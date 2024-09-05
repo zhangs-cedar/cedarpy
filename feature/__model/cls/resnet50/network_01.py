@@ -23,8 +23,7 @@ class MultiFeatureNet(nn.Module):
         self.fcfeature = nn.Linear(in_features=72, out_features=512)
         self.fc2 = nn.Linear(in_features=1024, out_features=num_class)
         if device is None:
-            self.device = torch.device(
-                "cuda" if torch.cuda.is_available() else "cpu")
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = device
 
@@ -68,8 +67,7 @@ def train_one_epoch(model, dataloader, criterion, optimizer):
         optimizer.zero_grad()
         output = model.forward(input, feature)
         _, pred = torch.max(output, dim=1)
-        loss = criterion(pred.to(dtype=torch.float32),
-                         label.squeeze(1).to(dtype=torch.float32))
+        loss = criterion(pred.to(dtype=torch.float32), label.squeeze(1).to(dtype=torch.float32))
 
         loss.backward()
         optimizer.step()
@@ -96,16 +94,12 @@ def model_train(
     save_dir="output",
 ):
     """训练模型"""
-    train_log = {
-        "loss": [],
-        "lr": []
-    }
+    train_log = {"loss": [], "lr": []}
     for epoch in range(num_epochs):
         loss, lr = train_one_epoch(model, train_loader, criterion, optimizer)
         print("Epoch: {}, loss: {:.4f}, lr: {:.6f}".format(epoch + 1, loss, lr))
         if (epoch + 1) % save_interval_epochs == 0:
-            torch.save(model.state_dict(), os.path.join(
-                save_dir, "model_{}.pth".format(epoch + 1)))
+            torch.save(model.state_dict(), os.path.join(save_dir, "model_{}.pth".format(epoch + 1)))
         train_log["loss"].append(loss)
         train_log["lr"].append(lr)
 
@@ -127,8 +121,7 @@ def test_02():
             sample_feature = np.random.randn(72).astype(np.float32)
             sample_label = np.array([1], dtype=np.float32)
 
-            sample = {"image": copy.deepcopy(sample_image), "feature": copy.deepcopy(
-                sample_feature), "label": copy.deepcopy(sample_label)}
+            sample = {"image": copy.deepcopy(sample_image), "feature": copy.deepcopy(sample_feature), "label": copy.deepcopy(sample_label)}
             return sample
 
         def __len__(self):
