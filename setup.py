@@ -1,6 +1,6 @@
 import setuptools
 
-__version__ = "0.0.7rc5"
+__version__ = "0.0.7rc6"
 
 setuptools.setup(
     name="cedar",  # 模块名称

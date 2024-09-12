@@ -43,7 +43,9 @@ class TrainSegmentation:
         training_imgs = cv2.cvtColor(training_imgs, cv2.COLOR_BGR2GRAY)
         training_imgs = np.expand_dims(cv2.pyrDown(cv2.pyrDown(training_imgs)), axis=2)
         # 构建训练标签
-        training_labels = cv2.resize(training_labels, (training_imgs.shape[1], training_imgs.shape[0]), interpolation=cv2.INTER_NEAREST)  # 线性插值
+        training_labels = cv2.resize(
+            training_labels, (training_imgs.shape[1], training_imgs.shape[0]), interpolation=cv2.INTER_NEAREST
+        )  # 线性插值
 
         return training_imgs, training_labels
 
@@ -89,7 +91,9 @@ class DefaultPredictor:
         # 图片预处理和特征提取：于训练时一致
         t1 = time.time()
         img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
-        edges = cv2.Canny(cv2.GaussianBlur(img, (self.GaussianBlur[0], self.GaussianBlur[1]), 0), self.Canny[0], self.Canny[1])  # 高斯滤波,边缘检测
+        edges = cv2.Canny(
+            cv2.GaussianBlur(img, (self.GaussianBlur[0], self.GaussianBlur[1]), 0), self.Canny[0], self.Canny[1]
+        )  # 高斯滤波,边缘检测
         imgp2 = np.expand_dims(cv2.pyrDown(cv2.pyrDown(img)), axis=2)
         multiscale_features = self.multiscale(imgp2)
 
@@ -104,7 +108,9 @@ class DefaultPredictor:
         _, result = cv2.threshold(result, 1, 255, cv2.THRESH_BINARY)  # 二值化:大于等于1的为255,小于1的为0 # 二值化
 
         result = cv2.erode(result, np.ones((3, 2), np.uint8), iterations=self.erode_iterations[0])  # 腐蚀 3, 2 主要作用于纵向
-        result = cv2.dilate(result, np.ones((1, 5), np.uint8), iterations=self.erode_iterations[1])  # 膨胀 1, 5 主要作用于横向,增强横向的联通性
+        result = cv2.dilate(
+            result, np.ones((1, 5), np.uint8), iterations=self.erode_iterations[1]
+        )  # 膨胀 1, 5 主要作用于横向,增强横向的联通性
         result = cv2.resize(result, (edges.shape[1], edges.shape[0]), interpolation=cv2.INTER_NEAREST)  # 线性插值
 
         return result, edges

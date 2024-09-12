@@ -1,3 +1,7 @@
+from cedar.draw import *
+from cedar.utils import *
+from cedar.image import *
+from cedar.label import *
 import os
 import os.path as osp
 import shutil
@@ -16,11 +20,6 @@ from tqdm import tqdm
 from PIL import Image, ImageDraw
 from io import BytesIO
 from collections import defaultdict
-
-from cedar.draw import *
-from cedar.utils import *
-from cedar.image import *
-from cedar.label import *
 
 
 alt.data_transformers.enable("vegafusion")
