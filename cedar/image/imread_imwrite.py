@@ -1,7 +1,5 @@
 import cv2
 import numpy as np
-import cv2
-import numpy as np
 from cedar.utils.tools import split_filename
 
 
