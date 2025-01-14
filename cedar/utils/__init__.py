@@ -11,4 +11,5 @@ from cedar.utils.tools import (
     get_file_md5,
     find_duplicate_filenames,
     move_file,
+    copy_file,
 )

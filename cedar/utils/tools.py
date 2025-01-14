@@ -149,3 +149,36 @@ def move_file(src_path, dst_dir, filename=None):
         os.remove(dst_path)
     # 移动文件
     shutil.move(src_path, dst_path)
+
+
+def copy_file(src_path, dst_dir, filename=None):
+    """
+    将文件从源路径移动到目标目录，并可选择性地重命名文件。
+
+    Args:
+        src_path (str): 源文件的路径。
+        dst_dir (str): 目标目录的路径。
+        filename (str, optional): 可选的文件名，如果提供，则将源文件重命名为该名称。
+            默认为None，表示使用源文件的原始文件名。
+
+    Returns:
+        None
+
+    Raises:
+        FileNotFoundError: 如果源文件不存在，则引发此异常。
+        PermissionError: 如果用户没有足够的权限来移动文件或创建目录，则可能引发此异常。
+        其他可能的异常: 调用os和shutil模块时可能引发的其他异常。
+
+    """
+    # 如果没有提供文件名，则使用源文件的文件名
+    if filename is None:
+        filename = os.path.basename(src_path)
+    # 确保目标目录存在
+    os.makedirs(dst_dir, exist_ok=True)
+    # 目标文件的完整路径
+    dst_path = os.path.join(dst_dir, filename)
+    # 如果目标目录中存在同名文件，则删除它
+    if os.path.exists(dst_path):
+        os.remove(dst_path)
+    # 移动文件
+    shutil.copy(src_path, dst_path)
