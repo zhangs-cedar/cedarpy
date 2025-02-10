@@ -1,16 +1,17 @@
 import os
 import os.path as osp
+import natsort
 import shutil
 import hashlib
 import time
-import datetime
 import traceback
 import subprocess
 from functools import wraps
+from datetime import datetime
 
 
 def create_name():
-    strtime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")  # 格式化日期时间，年月日时分秒毫秒
+    strtime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")  # 格式化日期时间，年月日时分秒毫秒
     return strtime
 
 
@@ -196,12 +197,16 @@ def get_files_list(input_dir):
             file_path = os.path.join(root, file)
             names = osp.basename(file_path)
             name, suffix = split_filename(names)
+            # 获取文件的修改时间（以时间戳形式）
+            modification_time = osp.getmtime(file_path)
             file = {}
             file["name"] = name
             file["suffix"] = suffix
             file["names"] = names
             file["path"] = file_path
             file["root"] = root
+            file["modification_time"] = datetime.fromtimestamp(modification_time)
+            
             files_list.append(file)
     # 按照文件名排序
     files_list = natsort.natsorted(files_list, key=lambda x: x["name"])
