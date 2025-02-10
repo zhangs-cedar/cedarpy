@@ -2,6 +2,7 @@ from cedar.draw import *
 from cedar.utils import *
 from cedar.image import *
 from cedar.label import *
+from cedar.pdx import *
 import os
 import os.path as osp
 import shutil

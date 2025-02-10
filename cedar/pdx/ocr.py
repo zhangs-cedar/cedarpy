@@ -1,0 +1,31 @@
+from paddleocr import PaddleOCR
+from cedar.image import imread
+from cedar.utils import timeit
+
+
+class OCR:
+    def __init__(self):
+        self.pocr = PaddleOCR(lang="ch")  # need to run only once to download and load model into memory
+
+    def set_shape(self, img_path):
+        img_cv2 = imread(img_path)
+        h, w = img_cv2.shape[:2]
+        print("image shape is w: {}, h: {}".format(w, h))
+
+    @timeit
+    def __call__(self, img_path):
+        result = self.pocr.ocr(img_path, cls=False)
+        pos, res = result[0][0][0], result[0][0][1][0]
+        # 计算中心坐标
+        center_x = sum(x for x, y in pos) / len(pos)
+        center_y = sum(y for x, y in pos) / len(pos)
+        center_coordinates = [center_x, center_y]
+        return pos, center_coordinates, res
+
+
+if __name__ == "__main__":
+    img_path = "/Users/zhangsong/workspace/OpenSource/create_idea/frames/frame_0.png"
+    ocr = OCR()
+    ocr.set_shape(img_path)
+    result = ocr(img_path)
+    print(result)
