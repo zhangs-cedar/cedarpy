@@ -16,14 +16,14 @@ def find_image_path(file_path, name, extensions=[".png", ".bmp", ".jpg"]):
             return img_path
     return None
 
+
 def is_image(file_path):
     """
     判断给定的文件路径是否指向一个有效且支持的图像文件。
     """
-    valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp']
+    valid_extensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"]
     file_extension = osp.splitext(file_path)[1].lower()
     return file_extension in valid_extensions
-
 
 
 def array_to_base64(image_array):

@@ -12,5 +12,5 @@ from cedar.utils.tools import (
     find_duplicate_filenames,
     move_file,
     copy_file,
-    get_files_list
+    get_files_list,
 )

@@ -18,7 +18,7 @@ def imread(image_path: str, flag: int = cv2.IMREAD_COLOR) -> np.ndarray:
     return img
 
 
-def imwrite(image_path: str, img: np.ndarray,plt=False) -> object:
+def imwrite(image_path: str, img: np.ndarray, plt=False) -> object:
     """保存图片,如果plt则先转通道再保存
 
     Args:

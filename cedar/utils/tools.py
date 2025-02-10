@@ -183,6 +183,7 @@ def copy_file(src_path, dst_dir, filename=None):
     # 移动文件
     shutil.copy(src_path, dst_path)
 
+
 def get_files_list(input_dir):
     """获取文件列表
     Args:

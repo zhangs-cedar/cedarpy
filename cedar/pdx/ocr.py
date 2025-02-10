@@ -2,9 +2,10 @@ from paddleocr import PaddleOCR
 from cedar.image import imread
 from zhconv import convert
 
+
 class OCR:
     def __init__(self):
-        self.pocr = PaddleOCR(lang="ch",show_log=False)  # need to run only once to download and load model into memory
+        self.pocr = PaddleOCR(lang="ch", show_log=False)  # need to run only once to download and load model into memory
 
     def set_shape(self, img_path):
         img_cv2 = imread(img_path)
@@ -22,7 +23,7 @@ class OCR:
             center_coordinates = [center_x, center_y]
         except:
             print(img)
-        simplified_text = convert(res, 'zh-cn')
+        simplified_text = convert(res, "zh-cn")
         return pos, center_coordinates, simplified_text
 
 
