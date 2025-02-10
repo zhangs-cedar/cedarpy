@@ -18,13 +18,15 @@ def imread(image_path: str, flag: int = cv2.IMREAD_COLOR) -> np.ndarray:
     return img
 
 
-def imwrite(image_path: str, img: np.ndarray) -> object:
-    """保存图片
+def imwrite(image_path: str, img: np.ndarray,plt=False) -> object:
+    """保存图片,如果plt则先转通道再保存
 
     Args:
         image_path (str): 图片路径
         img (np.ndarray): 图片矩阵
     """
+    if plt:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     _, suffix = split_filename(image_path)
     cv2.imencode(suffix, img)[1].tofile(image_path)
     return None

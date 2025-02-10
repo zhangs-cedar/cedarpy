@@ -182,3 +182,26 @@ def copy_file(src_path, dst_dir, filename=None):
         os.remove(dst_path)
     # 移动文件
     shutil.copy(src_path, dst_path)
+
+def get_files_list(input_dir):
+    """获取文件列表
+    Args:
+        input_dir: 输入目录
+        return: 文件路径列表
+    """
+    files_list = []
+    for root, dirs, files in os.walk(input_dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            names = osp.basename(file_path)
+            name, suffix = split_filename(names)
+            file = {}
+            file["name"] = name
+            file["suffix"] = suffix
+            file["names"] = names
+            file["path"] = file_path
+            file["root"] = root
+            files_list.append(file)
+    # 按照文件名排序
+    files_list = natsort.natsorted(files_list, key=lambda x: x["name"])
+    return files_list
