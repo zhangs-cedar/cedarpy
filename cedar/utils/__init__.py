@@ -6,6 +6,7 @@ from cedar.utils.tools import (
     rmtree_makedirs,
     split_filename,
     timeit,
+    set_timeit_env,
     create_name,
     run_subprocess,
     get_file_md5,

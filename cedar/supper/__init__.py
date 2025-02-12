@@ -1,4 +1,4 @@
 try:
-    from cedar.supper.tools import s_print
+    from cedar.supper.tools import print
 except:
     pass

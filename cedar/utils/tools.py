@@ -8,6 +8,7 @@ import traceback
 import subprocess
 from functools import wraps
 from datetime import datetime
+from cedar.supper import print
 
 
 def create_name():
@@ -48,20 +49,33 @@ def rmtree_makedirs(*args):
 
 
 def timeit(func):
-    """时间修饰器"""
+    """时间修饰器，通过环境变量 timeit_debug 控制是否打印时间信息"""
 
     @wraps(func)
     def decorated(*args, **kwargs):
         start = time.time()
         try:
             res = func(*args, **kwargs)
-            print("[Method {}], FINISH Time {} s: \n".format(func.__name__, round((time.time() - start), 4)))
+            if os.getenv("timeit_debug", "false").lower() == "true":
+                print("[Method {}], FINISH Time {} s: \n".format(func.__name__, round((time.time() - start), 4)))
             return res
-        except:
-            print(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
+        except Exception as e:
+            if os.getenv("timeit_debug", "false").lower() == "true":
+                print(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
             exit(0)
 
     return decorated
+
+
+def set_timeit_env(debug=True):
+    """
+    设置或修改环境变量timeit_debug
+    """
+    # 将 debug 参数转换为字符串
+    debug_str = str(debug)
+    # 直接设置环境变量 timeit_debug 的值
+    os.environ["timeit_debug"] = debug_str
+    print(f"环境变量 timeit_debug 已设置为 {debug_str}")
 
 
 def run_subprocess(cmd, cwd=None):
