@@ -1,1 +1,4 @@
-from cedar.pdx.ocr import OCR
+try:
+    from cedar.pdx.ocr import OCR
+except:
+    pass
