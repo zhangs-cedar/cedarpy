@@ -3,6 +3,20 @@ from cedar.image import imread
 from zhconv import convert
 
 
+def extract_strings(data):
+    result = []
+    if isinstance(data, list):
+        for item in data:
+            result.extend(extract_strings(item))
+    elif isinstance(data, tuple):
+        for item in data:
+            result.extend(extract_strings(item))
+    elif isinstance(data, str):
+        result.append(data)
+    new_result = "".join([convert(r, "zh-tw") for r in result])
+    return new_result
+
+
 class OCR:
     def __init__(self):
         self.pocr = PaddleOCR(lang="ch", show_log=False)  # need to run only once to download and load model into memory
@@ -13,22 +27,17 @@ class OCR:
         print("image shape is w: {}, h: {}".format(w, h))
 
     def __call__(self, img):
-        pos, center_coordinates, res = [], [], ""
+        res = ""
         try:
             result = self.pocr.ocr(img, cls=False)
-            pos, res = result[0][0][0], result[0][0][1][0]
-            # 计算中心坐标
-            center_x = sum(x for x, y in pos) / len(pos)
-            center_y = sum(y for x, y in pos) / len(pos)
-            center_coordinates = [center_x, center_y]
+            res = extract_strings(result)
         except:
             print(img)
-        simplified_text = convert(res, "zh-cn")
-        return pos, center_coordinates, simplified_text
+        return res
 
 
 if __name__ == "__main__":
-    img_path = "/Users/zhangsong/workspace/OpenSource/create_idea/frames/frame_0.png"
+    img_path = "/Users/zhangsong/workspace/OpenSource/create_idea/old/frames/frame_7.png"
     ocr = OCR()
     ocr.set_shape(img_path)
     result = ocr(img_path)

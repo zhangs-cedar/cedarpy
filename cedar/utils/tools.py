@@ -185,29 +185,37 @@ def copy_file(src_path, dst_dir, filename=None):
     shutil.copy(src_path, dst_path)
 
 
-def get_files_list(input_dir):
+def get_files_list(input_path):
     """获取文件列表
     Args:
-        input_dir: 输入目录
+        input_path: 输入目录 | 文件路径
         return: 文件路径列表
     """
-    files_list = []
-    for root, dirs, files in os.walk(input_dir):
-        for file in files:
-            file_path = os.path.join(root, file)
-            names = osp.basename(file_path)
-            name, suffix = split_filename(names)
-            # 获取文件的修改时间（以时间戳形式）
-            modification_time = osp.getmtime(file_path)
-            file = {}
-            file["name"] = name
-            file["suffix"] = suffix
-            file["names"] = names
-            file["path"] = file_path
-            file["root"] = root
-            file["modification_time"] = datetime.fromtimestamp(modification_time)
-            
-            files_list.append(file)
+    filepath_list = []
+
+    if os.path.isfile(input_path):  # 如果是文件
+        filepath_list.append(input_path)
+    elif os.path.isdir(input_path):  # 如果是目录
+        for root, dirs, files in os.walk(input_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                filepath_list.append(file_path)
+    else:
+        raise ValueError("Input path must be a file or directory.")
     # 按照文件名排序
+    files_list = []
+    for file_path in filepath_list:
+        names = osp.basename(file_path)
+        root = osp.dirname(file_path)
+        name, suffix = split_filename(names)
+        modification_time = osp.getmtime(file_path)
+        file = {}
+        file["name"] = name
+        file["suffix"] = suffix
+        file["names"] = names
+        file["path"] = file_path
+        file["root"] = root
+        file["modification_time"] = datetime.fromtimestamp(modification_time)
+        files_list.append(file)
     files_list = natsort.natsorted(files_list, key=lambda x: x["name"])
     return files_list
