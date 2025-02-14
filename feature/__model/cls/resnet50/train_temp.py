@@ -15,7 +15,9 @@ train_dataset = MyDataset(
     transforms=train_transforms,
 )
 
-eval_dataset = MyDataset(data_dir="vegetables_cls", file_list="vegetables_cls/val_list.txt", label_list="vegetables_cls/labels.txt", transforms=eval_transforms)
+eval_dataset = MyDataset(
+    data_dir="vegetables_cls", file_list="vegetables_cls/val_list.txt", label_list="vegetables_cls/labels.txt", transforms=eval_transforms
+)
 
 # 初始化模型，并进行训练
 model = MutiFeatureNet(num_classes=len(train_dataset.labels))
