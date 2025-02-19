@@ -1,5 +1,5 @@
 import yaml
-import json
+import json5 as json
 import os
 from cedar.utils.dict2obj import Dict2Obj
 
