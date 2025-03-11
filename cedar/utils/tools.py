@@ -60,8 +60,7 @@ def timeit(func):
                 print("[Method {}], FINISH Time {} s: \n".format(func.__name__, round((time.time() - start), 4)))
             return res
         except Exception as e:
-            if os.getenv("timeit_debug", "false").lower() == "true":
-                print(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
+            print(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
             exit(0)
 
     return decorated
