@@ -60,7 +60,8 @@ def timeit(func):
                 print("[Method {}], FINISH Time {} s: \n".format(func.__name__, round((time.time() - start), 4)))
             return res
         except Exception as e:
-            print(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
+            if os.getenv("timeit_debug", "false").lower() == "true":
+                print(str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0])
             exit(0)
 
     return decorated
@@ -198,7 +199,7 @@ def copy_file(src_path, dst_dir, filename=None):
     shutil.copy(src_path, dst_path)
 
 
-def get_files_list(input_path):
+def get_files_list(input_path,find_suffix=[], sortby="name"):
     """获取文件列表
     Args:
         input_path: 输入目录 | 文件路径
@@ -221,6 +222,8 @@ def get_files_list(input_path):
         names = osp.basename(file_path)
         root = osp.dirname(file_path)
         name, suffix = split_filename(names)
+        if len(find_suffix)!=0 and suffix not in find_suffix: # 如果find_suffix为空，则不跳过，else找不到指定的后缀，则跳过,
+            continue
         modification_time = osp.getmtime(file_path)
         file = {}
         file["name"] = name
@@ -230,5 +233,5 @@ def get_files_list(input_path):
         file["root"] = root
         file["modification_time"] = datetime.fromtimestamp(modification_time)
         files_list.append(file)
-    files_list = natsort.natsorted(files_list, key=lambda x: x["name"])
+    files_list = natsort.natsorted(files_list, key=lambda x: x[sortby])
     return files_list

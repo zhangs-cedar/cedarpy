@@ -17,7 +17,7 @@ class Config:
         _, extension = os.path.splitext(path)
         if extension == ".yaml" or extension == ".yml":
             return self.read_yaml(path)
-        elif extension == ".json":
+        elif extension == ".json" or extension == ".json5":
             return self.read_json(path)
         else:
             raise ValueError("Unsupported file format: {}".format(extension))
