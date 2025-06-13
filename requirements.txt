@@ -6,3 +6,5 @@ pandas
 scikit-learn
 tqdm
 black
+opencv-python>=4.5.0
+fastmcp>=0.1.0
