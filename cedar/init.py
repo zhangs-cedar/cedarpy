@@ -3,7 +3,6 @@ from cedar.utils import *
 from cedar.image import *
 from cedar.label import *
 from cedar.pdx import *
-from cedar.supper import *
 import os
 import os.path as osp
 import time
