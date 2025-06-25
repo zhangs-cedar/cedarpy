@@ -1,38 +1,41 @@
 """
-mask : 0/255 mask of the image, 0 for the background, 255 for the foreground
+轮廓处理模块
+
+提供图像轮廓检测、向量计算、角度计算等功能。
+mask: 0/255 mask of the image, 0 for the background, 255 for the foreground
 """
 
 import cv2
 import numpy as np
+from typing import List, Tuple, Union
 
 
-def get_contours(mask):
-    """
-    Get the contours of a mask.
-    Parameters:
-        mask : 0/255 mask of the image, 0 for the background, 255 for the foreground
+def get_contours(mask: np.ndarray) -> List[np.ndarray]:
+    """获取掩码图像的轮廓
+
+    Args:
+        mask: 二值掩码图像，0表示背景，255表示前景
+
     Returns:
-        contours : list of tuples (x, y) representing the contour points
+        List[np.ndarray]: 轮廓点列表，每个轮廓是一个numpy数组
     """
-    # Find the contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     return contours
 
 
-def get_vertios(point1, point2):
-    """
-    根据两个点计算向量。向量的坐标系为直角坐标系，x轴为水平方向，y轴为垂直方向。
+def get_vertios(point1: List[float], point2: List[float]) -> List[float]:
+    """根据两个点计算向量
+
+    向量的坐标系为直角坐标系，x轴为水平方向，y轴为垂直方向。
     注：y需要取负值，因为y轴向上为正。
 
     Args:
-        point1 (list): 第一个点的坐标，格式为 [x, y]。
-        point2 (list): 第二个点的坐标，格式为 [x, y]。
+        point1: 第一个点的坐标，格式为 [x, y]
+        point2: 第二个点的坐标，格式为 [x, y]
 
     Returns:
-        list: 两个点的向量，格式为 [x, y]。
-
+        List[float]: 两个点的向量，格式为 [x, y]
     """
-
     if point1[0] > point2[0]:
         v = [point1[0] - point2[0], point2[1] - point1[1]]
     else:
@@ -40,22 +43,37 @@ def get_vertios(point1, point2):
     return v
 
 
-def get_longside_rect_ps(rect_ps):
-    """ """
+def get_longside_rect_ps(rect_ps: np.ndarray) -> List[float]:
+    """获取矩形长边的向量
+
+    Args:
+        rect_ps: 矩形四个点的坐标数组
+
+    Returns:
+        List[float]: 长边向量，格式为 [x, y]
+    """
     p0 = rect_ps[0]
     p1 = rect_ps[1]
     p2 = rect_ps[-1]
-    dis1 = np.linalg.norm((p0 - p1))
-    dis2 = np.linalg.norm((p0 - p2))
+
+    dis1 = np.linalg.norm(p0 - p1)
+    dis2 = np.linalg.norm(p0 - p2)
+
     if dis1 > dis2:
-        return get_vertios(p0, p1)
+        return get_vertios(p0.tolist(), p1.tolist())
     else:
-        return get_vertios(p0, p2)
+        return get_vertios(p0.tolist(), p2.tolist())
 
 
-def calcu_angle_between_verctors(v1, v2):
-    """
-    计算两个向量之间的夹角。(0-180度)
+def calcu_angle_between_verctors(v1: List[float], v2: List[float]) -> float:
+    """计算两个向量之间的夹角
+
+    Args:
+        v1: 第一个向量，格式为 [x, y]
+        v2: 第二个向量，格式为 [x, y]
+
+    Returns:
+        float: 两个向量之间的夹角，单位为度，范围为0-180度
     """
     # 计算向量的点积
     dot_product = np.dot(v1, v2)
@@ -69,23 +87,30 @@ def calcu_angle_between_verctors(v1, v2):
     return angle_deg
 
 
-def calcu_angle(v1):
+def calcu_angle(v1: List[float]) -> float:
+    """计算向量与x轴正方向的夹角
+
+    Args:
+        v1: 向量，格式为 [x, y]
+
+    Returns:
+        float: 向量与x轴正方向的夹角，单位为度
+    """
     v2 = [1, 0]
     angle_deg = calcu_angle_between_verctors(v1, v2)
     return angle_deg
 
 
-def get_minAreaRect(cnt):
-    """
-    Get the minimum area rectangle of a contour.
-    Parameters:
-        cnt : contour
+def get_minAreaRect(
+    cnt: np.ndarray,
+) -> Tuple[Tuple[float, float], Tuple[float, float], float]:
+    """获取轮廓的最小外接矩形
+
+    Args:
+        cnt: 轮廓点数组
+
     Returns:
-        minAreaRect : tuple (x, y, width, height) representing the minimum area rectangle
+        Tuple: 最小外接矩形信息，包含中心点、宽高和角度
     """
-    # Find the minimum area rectangle of the contour
     rect = cv2.minAreaRect(cnt)
-    (center_x, center_y), (width, height), _angle = rect
-    rect_ps = cv2.boxPoints(rect)
-    box = np.int0(rect_ps)
     return rect
