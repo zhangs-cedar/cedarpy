@@ -1,9 +1,12 @@
-""" colorlist的使用
-    colorlist是一个颜色列表,可以用来生成颜色。
-    注意: colorlist的颜色是按照BGR的方式来生成的,而不是按照RGB的方式来生成的。
+"""
+color_list: 颜色列表，BGR格式
+
+可用于OpenCV绘图等场景。
 """
 
-color_list = [
+from typing import List
+
+color_list: List[List[int]] = [
     [188, 113, 0],
     [24, 82, 216],
     [31, 176, 236],
