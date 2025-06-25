@@ -7,9 +7,7 @@ from cedar.utils.tools import create_name
 _logger: Optional[logging.Logger] = None
 
 
-def init_logger(
-    name: str = __name__, log_file: Optional[str] = None, log_level: int = logging.INFO
-) -> None:
+def init_logger(name: str = __name__, log_file: Optional[str] = None, log_level: int = logging.INFO) -> None:
     """初始化并获取日志记录器
 
     如果尚未初始化日志记录器，则通过此方法初始化日志记录器，添加一个或两个处理程序；
@@ -28,9 +26,7 @@ def init_logger(
     assert _logger is None, "logger should not be initialized twice or more."
     _logger = logging.getLogger(name)
 
-    formatter = logging.Formatter(
-        "[%(asctime)s] %(name)s %(levelname)s: %(message)s", datefmt="%Y/%m/%d %H:%M:%S"
-    )
+    formatter = logging.Formatter("[%(asctime)s] %(name)s %(levelname)s: %(message)s", datefmt="%Y/%m/%d %H:%M:%S")
 
     stream_handler = logging.StreamHandler(stream=sys.stdout)
     stream_handler.setFormatter(formatter)
@@ -91,5 +87,3 @@ def error(fmt: str, *args: Any) -> None:
     """
     if _logger:
         _logger.error(fmt, *args)
-
-

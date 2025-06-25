@@ -1,9 +1,7 @@
 from typing import List, Tuple
 
 
-def calculate_iou(
-    box1: Tuple[float, float, float, float], box2: Tuple[float, float, float, float]
-) -> float:
+def calculate_iou(box1: Tuple[float, float, float, float], box2: Tuple[float, float, float, float]) -> float:
     """计算两个矩形框之间的交并比(IoU)
 
     Args:

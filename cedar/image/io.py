@@ -8,9 +8,7 @@ from urllib.parse import quote, unquote
 from typing import List, Optional
 
 
-def find_image_path(
-    file_path: str, name: str, extensions: List[str] = [".png", ".bmp", ".jpg"]
-) -> Optional[str]:
+def find_image_path(file_path: str, name: str, extensions: List[str] = [".png", ".bmp", ".jpg"]) -> Optional[str]:
     """在给定文件路径的同一目录下查找图片文件
 
     根据文件名和扩展名列表查找图片文件的完整路径。
@@ -90,9 +88,7 @@ def path_to_url(file_path: str) -> str:
         raise ValueError("文件路径不能为空")
 
     # 将本地路径转换为 URL 编码的字符串，但不编码驱动器号
-    encoded_path = (
-        quote(file_path.replace("\\\\", "/")).replace("%3A", ":").replace("%5C", "/")
-    )
+    encoded_path = quote(file_path.replace("\\\\", "/")).replace("%3A", ":").replace("%5C", "/")
 
     # 构建 file URL
     url = f"file:///{encoded_path}"

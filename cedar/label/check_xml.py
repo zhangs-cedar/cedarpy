@@ -4,9 +4,7 @@ from xml.etree import cElementTree as et
 from typing import Union, Tuple
 
 
-def check_xml(
-    img_file: Union[str, np.ndarray], xml_file: Union[str, et.ElementTree]
-) -> bool:
+def check_xml(img_file: Union[str, np.ndarray], xml_file: Union[str, et.ElementTree]) -> bool:
     """核对标签文件是否正确
 
     检查XML标签文件中的标注框是否与图像尺寸匹配，以及标注框是否在有效范围内。
@@ -79,10 +77,7 @@ def check_xml(
         ymin_element = bndbox.find("ymin")
         ymax_element = bndbox.find("ymax")
 
-        if any(
-            elem is None
-            for elem in [xmin_element, xmax_element, ymin_element, ymax_element]
-        ):
+        if any(elem is None for elem in [xmin_element, xmax_element, ymin_element, ymax_element]):
             return False
 
         col_min = int(xmin_element.text)

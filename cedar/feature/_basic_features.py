@@ -33,11 +33,7 @@ def _texture_filter(gaussian_filtered: np.ndarray) -> Tuple[np.ndarray, ...]:
 
 
 def _singlescale_basic_features_singlechannel(
-    img: np.ndarray, 
-    sigma: float, 
-    intensity: bool = True, 
-    edges: bool = True, 
-    texture: bool = True
+    img: np.ndarray, sigma: float, intensity: bool = True, edges: bool = True, texture: bool = True
 ) -> Tuple[np.ndarray, ...]:
     """单尺度单通道基础特征提取
 
@@ -53,14 +49,14 @@ def _singlescale_basic_features_singlechannel(
     """
     results = ()
     gaussian_filtered = filters.gaussian(img, sigma, preserve_range=False)
-    
+
     if intensity:
         results += (gaussian_filtered,)
     if edges:
         results += (filters.sobel(gaussian_filtered),)
     if texture:
         results += (*_texture_filter(gaussian_filtered),)
-    
+
     return results
 
 
@@ -91,10 +87,10 @@ def _multiscale_basic_features_singlechannel(
     """
     # 转换为float32以提高计算速度
     img = np.ascontiguousarray(img_as_float32(img))
-    
+
     if num_sigma is None:
         num_sigma = int(np.log2(sigma_max) - np.log2(sigma_min) + 1)
-    
+
     sigmas = np.logspace(
         np.log2(sigma_min),
         np.log2(sigma_max),
@@ -102,17 +98,15 @@ def _multiscale_basic_features_singlechannel(
         base=2,
         endpoint=True,
     )
-    
+
     with ThreadPoolExecutor(max_workers=num_workers) as ex:
         out_sigmas = list(
             ex.map(
-                lambda s: _singlescale_basic_features_singlechannel(
-                    img, s, intensity=intensity, edges=edges, texture=texture
-                ),
+                lambda s: _singlescale_basic_features_singlechannel(img, s, intensity=intensity, edges=edges, texture=texture),
                 sigmas,
             )
         )
-    
+
     features = itertools.chain.from_iterable(out_sigmas)
     return features
 
@@ -153,11 +147,8 @@ def multiscale_basic_features(
         ValueError: 当所有特征类型都为False时
     """
     if not any([intensity, edges, texture]):
-        raise ValueError(
-            "At least one of `intensity`, `edges` or `textures` "
-            "must be True for features to be computed."
-        )
-    
+        raise ValueError("At least one of `intensity`, `edges` or `textures` " "must be True for features to be computed.")
+
     if channel_axis is None:
         image = image[..., np.newaxis]
         channel_axis = -1
@@ -177,20 +168,20 @@ def multiscale_basic_features(
         )
         for dim in range(image.shape[-1])
     )
-    
+
     features = list(itertools.chain.from_iterable(all_results))
     out = np.stack(features, axis=-1)
     return out
 
 
 def multiscale_features(
-    intensity: bool = True, 
-    edges: bool = True, 
-    texture: bool = True, 
-    sigma_min: int = 1, 
-    sigma_max: int = 3, 
-    num_workers: Optional[int] = None, 
-    channel_axis: int = -1
+    intensity: bool = True,
+    edges: bool = True,
+    texture: bool = True,
+    sigma_min: int = 1,
+    sigma_max: int = 3,
+    num_workers: Optional[int] = None,
+    channel_axis: int = -1,
 ) -> Callable[[np.ndarray], np.ndarray]:
     """创建多尺度特征提取函数
 

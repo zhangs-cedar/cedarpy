@@ -3,9 +3,7 @@ import numpy as np
 from typing import Tuple, Union
 
 
-def roate_image(
-    img: np.ndarray, angle: float, border_value: Tuple[int, int, int] = (0, 0, 0)
-) -> np.ndarray:
+def roate_image(img: np.ndarray, angle: float, border_value: Tuple[int, int, int] = (0, 0, 0)) -> np.ndarray:
     """对图像进行旋转操作
 
     目前仅支持正方形图像的旋转操作，且旋转角度为正数表示逆时针旋转，
@@ -42,9 +40,7 @@ def roate_image(
     M[1, 2] += (n_h / 2) - c_y
 
     # 执行旋转变换
-    rotated_img = cv2.warpAffine(
-        img, M, (n_w, n_h), flags=cv2.INTER_NEAREST, borderValue=border_value
-    )
+    rotated_img = cv2.warpAffine(img, M, (n_w, n_h), flags=cv2.INTER_NEAREST, borderValue=border_value)
 
     # 裁剪到原始尺寸
     p_w = (n_w - w) // 2

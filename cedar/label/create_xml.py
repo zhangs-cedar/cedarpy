@@ -2,9 +2,7 @@ import xml.dom.minidom as minidom
 from typing import List, Tuple
 
 
-def create_xml(
-    img_name: str, height: int, width: int, labels: List[str], bboxes: List[List[int]]
-) -> minidom.Document:
+def create_xml(img_name: str, height: int, width: int, labels: List[str], bboxes: List[List[int]]) -> minidom.Document:
     """创建XML标注文件
 
     根据图像信息和标注数据创建符合VOC格式的XML文档对象。
@@ -36,9 +34,7 @@ def create_xml(
     # 创建标注对象节点
     for i, (label, bbox) in enumerate(zip(labels, bboxes)):
         if len(bbox) != 4:
-            raise IndexError(
-                f"bbox {i} must have exactly 4 elements: [xmin, ymin, xmax, ymax]"
-            )
+            raise IndexError(f"bbox {i} must have exactly 4 elements: [xmin, ymin, xmax, ymax]")
 
         xmin, ymin, xmax, ymax = bbox
         _create_object_node(xml_doc, root, label, xmin, ymin, xmax, ymax)

@@ -72,16 +72,10 @@ def timeit(func):
         start = time.time()
         try:
             result = func(*args, **kwargs)
-            print(
-                f"[Method {func.__name__}], FINISH Time {round((time.time() - start), 4)} s: \n"
-            )
+            print(f"[Method {func.__name__}], FINISH Time {round((time.time() - start), 4)} s: \n")
             return result
         except Exception as e:
-            error_trace = (
-                str(traceback.format_exc())
-                .split("func(*args, **kwargs)")[-1]
-                .split("decorated")[0]
-            )
+            error_trace = str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0]
             print(error_trace)
             exit(0)
 
@@ -99,9 +93,7 @@ def set_timeit_env(debug: bool = True) -> None:
     print(f"环境变量 timeit_debug 已设置为 {debug_str}")
 
 
-def run_subprocess(
-    cmd: Union[str, List[str]], cwd: Optional[str] = None
-) -> Tuple[subprocess.Popen, bytes, bytes]:
+def run_subprocess(cmd: Union[str, List[str]], cwd: Optional[str] = None) -> Tuple[subprocess.Popen, bytes, bytes]:
     """运行子进程并返回结果
 
     Args:
@@ -116,9 +108,7 @@ def run_subprocess(
         cwd = os.path.dirname(script_path)
 
     # 为了安全起见，避免使用shell=True，除非绝对必要
-    process = subprocess.Popen(
-        cmd, cwd=cwd, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-    )
+    process = subprocess.Popen(cmd, cwd=cwd, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 
     # 读取输出和错误，避免潜在的死锁
     stdout, stderr = process.communicate()
@@ -212,9 +202,7 @@ def copy_file(src_path: str, dst_dir: str, filename: Optional[str] = None) -> No
     shutil.copy(src_path, dst_path)
 
 
-def get_files_list(
-    input_path: str, find_suffix: Optional[List[str]] = None, sortby: str = "name"
-) -> List[Dict[str, Any]]:
+def get_files_list(input_path: str, find_suffix: Optional[List[str]] = None, sortby: str = "name") -> List[Dict[str, Any]]:
     """获取文件列表
 
     Args:
