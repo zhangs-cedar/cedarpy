@@ -2,6 +2,7 @@ import time
 import logging
 import cv2
 import numpy as np
+from typing import Any, Dict
 
 try:
     from sklearnex import patch_sklearn
@@ -17,7 +18,7 @@ from cedar.utils import timeit
 class TrainSegmentation:
     """训练ml模型"""
 
-    def __init__(self, model_path, config):
+    def __init__(self, model_path: str, config: Dict[str, Any]):
         self.multiscale = multiscale_features(edges=False, intensity=False, texture=True, num_workers=2)
         self.model_path = model_path
         self.config = config
@@ -25,7 +26,7 @@ class TrainSegmentation:
         self.b_width = config["b_width"]
         self.train_dir = config["train_dir"]
 
-    def _save_model(self):
+    def _save_model(self) -> None:
         """保存模型"""
         model = {
             "clf": self.clf,
@@ -36,7 +37,7 @@ class TrainSegmentation:
         }
         save_model(model, self.model_path)
 
-    def _load_data(self):
+    def _load_data(self) -> tuple:
         """加载数据"""
         training_imgs, training_labels = DataLoader(self.train_dir, self.b_width)
         # 构建训练图片
@@ -49,17 +50,17 @@ class TrainSegmentation:
 
         return training_imgs, training_labels
 
-    def train(self):
+    def train(self) -> Any:
         """训练"""
         logging.info("开始训练")
         training_imgs, training_labels = self._load_data()
-        logging.info("[构建训练数据] training_imgs.shape: {}".format(training_imgs.shape))
-        logging.info("[构建训练数据] training_labels.shape: {}".format(training_labels.shape))
+        logging.info(f"[构建训练数据] training_imgs.shape: {training_imgs.shape}")
+        logging.info(f"[构建训练数据] training_labels.shape: {training_labels.shape}")
 
         RandomForest = RandomForestClassifier(n_estimators=20, n_jobs=-1, max_depth=20, max_samples=0.05)  # n_jobs=并行数量
-        logging.info("[开始训练] RandomForest 网络: {}".format(RandomForest))
+        logging.info(f"[开始训练] RandomForest 网络: {RandomForest}")
         clf = fit_segmenter(training_labels, self.multiscale(training_imgs), RandomForest)
-        logging.info("[训练完成] RandomForest 网络: {}".format(RandomForest))
+        logging.info(f"[训练完成] RandomForest 网络: {RandomForest}")
 
         self.clf = clf
         self._save_model()
@@ -67,7 +68,7 @@ class TrainSegmentation:
 
 
 class DefaultPredictor:
-    def __init__(self, model_path):
+    def __init__(self, model_path: str):
         model = load_model(model_path)
         self.model = model
         # 模型参数
@@ -78,7 +79,7 @@ class DefaultPredictor:
         self.erode_iterations = model["erode_iterations"]
 
     @timeit
-    def __call__(self, original_image):
+    def __call__(self, original_image: np.ndarray) -> tuple:
         """检测单张图片,输出过滤结果
 
         Args:
@@ -99,10 +100,10 @@ class DefaultPredictor:
 
         # 预测
         t2 = time.time()
-        print("\n multiscale time: {} multiscale_features.shape: {}".format((t2 - t1), multiscale_features.shape))
+        print(f"\n multiscale time: {t2 - t1} multiscale_features.shape: {multiscale_features.shape}")
         result = predict_segmenter(multiscale_features, self.clf)
         t3 = time.time()
-        print("\n predict time: {}".format((t3 - t2)))
+        print(f"\n predict time: {t3 - t2}")
 
         # 后处理 1:other 2: 电池片
         _, result = cv2.threshold(result, 1, 255, cv2.THRESH_BINARY)  # 二值化:大于等于1的为255,小于1的为0 # 二值化

@@ -4,21 +4,24 @@ import cv2
 import joblib
 import numpy as np
 from xml.etree import ElementTree as et
+from typing import Tuple, Any
 from cedar.utils import split_filename
 
 
-def get_labels(xml_path: str, IMG_WIDTH: int, IMG_HEIGHT: int) -> np.ndarray:
+def get_labels(xml_path: str, img_width: int, img_height: int) -> np.ndarray:
     """获取标签
+
     Args:
-        xml_path (str): xml 文件路径
-        IMG_WIDTH (int): 图像宽度
-        IMG_HEIGHT (int): 图像高度
+        xml_path: xml 文件路径
+        img_width: 图像宽度
+        img_height: 图像高度
+
     Returns:
         np.ndarray: 标签
     """
     parsexml = et.parse(xml_path)
     root = parsexml.getroot()
-    labels = np.zeros((IMG_HEIGHT, IMG_WIDTH), dtype=np.uint8)
+    labels = np.zeros((img_height, img_width), dtype=np.uint8)
     for obj in root.findall("object"):
         name = obj.find("name").text
         bndbox = obj.find("bndbox")
@@ -30,81 +33,81 @@ def get_labels(xml_path: str, IMG_WIDTH: int, IMG_HEIGHT: int) -> np.ndarray:
             labels[ymin:ymax, xmin:xmax] = 1
         else:
             labels[ymin:ymax, xmin:xmax] = 2
-
     return labels
 
 
-def DataLoader(train_dir: str, IMG_WIDTH) -> object:
+def DataLoader(train_dir: str, img_width: int) -> Tuple[np.ndarray, np.ndarray]:
     """数据加载器, 用于获取训练数据
 
     Args:
-        train_dir (str): 训练集路径
-        IMG_WIDTH (int): 图像宽度
-        IMG_HEIGHT (int): 图像高度
+        train_dir: 训练集路径
+        img_width: 图像宽度
 
     Returns:
-        object: 图像和标签
+        Tuple[np.ndarray, np.ndarray]: 图像和标签
     Notes:
         图像和标签的格式为: (图像, 标签)
-        图像和标签经过两次cv2.pyrDown() 压缩, 图像的尺寸为: (IMG_WIDTH, IMG_HEIGHT)
+        图像和标签经过两次cv2.pyrDown() 压缩, 图像的尺寸为: (img_width, img_height)
     """
-
-    logging.info("loading data...".format(len(os.listdir(os.path.join(train_dir, "img")))))
-    for idx, img_name in enumerate(os.listdir(os.path.join(train_dir, "img"))):
-        name, suffix = split_filename(img_name)
-        # 兼容中文路径
-        img_path = os.path.join(train_dir, "img", img_name)
-        xml_path = os.path.join(train_dir, "xml", name + ".xml")
-
-        _img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), 1)  # 读取图片、兼容中文路径
-        IMG_HEIGHT = _img.shape[0]
-        img = np.zeros((IMG_HEIGHT, IMG_WIDTH, 3), dtype=np.uint8)
+    img_dir = os.path.join(train_dir, "img")
+    xml_dir = os.path.join(train_dir, "xml")
+    img_names = os.listdir(img_dir)
+    logging.info(f"loading data... {len(img_names)} images")
+    training_imgs = None
+    training_labels = None
+    for idx, img_name in enumerate(img_names):
+        name, _ = split_filename(img_name)
+        img_path = os.path.join(img_dir, img_name)
+        xml_path = os.path.join(xml_dir, name + ".xml")
+        _img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), 1)
+        img_height = _img.shape[0]
+        img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
         img[:, : _img.shape[1], :] = _img
-
+        label = get_labels(xml_path, img_width, img_height)
         if idx == 0:
-            training_imgs = np.zeros((1, IMG_WIDTH, 3), dtype=np.uint8)
-            training_labels = np.zeros((1, IMG_WIDTH), dtype=np.uint8)
-
-        training_imgs = np.vstack((training_imgs, img))
-        training_labels = np.vstack((training_labels, get_labels(xml_path, IMG_WIDTH, IMG_HEIGHT)))
+            training_imgs = img[None, ...]
+            training_labels = label[None, ...]
+        else:
+            training_imgs = np.vstack((training_imgs, img[None, ...]))
+            training_labels = np.vstack((training_labels, label[None, ...]))
     return training_imgs, training_labels
 
 
-def load_model(filepath: str) -> object:
-    """Load a pretrained classifier.
+def load_model(filepath: str) -> Any:
+    """加载预训练模型
+
     Args:
-        filepath (str): path to the pretrained classifier
+        filepath: 模型文件路径
+
     Returns:
-        object: pretrained classifier
-    Notes:
-        The classifier is a joblib.load()d object.
+        Any: 加载的模型对象
     """
     model = joblib.load(filepath)
-    logging.info("[Method {}], model loaded from {}".format("load_model", filepath))
+    logging.info(f"[Method load_model], model loaded from {filepath}")
     return model
 
 
-def save_model(model: object, filepath: str) -> object:
-    """Save a pretrained classifier.
+def save_model(model: Any, filepath: str) -> None:
+    """保存模型
+
     Args:
-        model (object): pretrained classifier
-        filepath (str): path to the pretrained classifier
-    Notes:
-        The classifier is a joblib.dump() object.
+        model: 需要保存的模型对象
+        filepath: 保存路径
     """
     joblib.dump(model, filepath)
-    logging.info("[Method {}], model saved to {}".format("save_model", filepath))
-    return None
+    logging.info(f"[Method save_model], model saved to {filepath}")
 
 
-def fit_segmenter(labels: np.ndarray, features: np.ndarray, clf: object) -> object:
-    """Segmentation using labeled parts of the image and a classifier.
+def fit_segmenter(labels: np.ndarray, features: np.ndarray, clf: Any) -> Any:
+    """使用有标签的图像和分类器进行分割训练
+
     Args:
-        labels (np.ndarray): labeled parts of the image
-        features (np.ndarray): features of the image
-        clf (object): classifier
+        labels: 图像标签
+        features: 图像特征
+        clf: 分类器
+
     Returns:
-        object: segmented image
+        Any: 训练好的分类器
     Notes:
         数据量不能太大, 否则会导致内存溢出
     """
@@ -115,13 +118,15 @@ def fit_segmenter(labels: np.ndarray, features: np.ndarray, clf: object) -> obje
     return clf
 
 
-def predict_segmenter(features: object, clf: object) -> object:
-    """Segmentation of images using a pretrained classifier.
+def predict_segmenter(features: np.ndarray, clf: Any) -> np.ndarray:
+    """使用预训练分类器进行图像分割预测
+
     Args:
-        features (object): features of the image
-        clf (object): classifier
+        features: 图像特征
+        clf: 分类器
+
     Returns:
-        object: segmented image
+        np.ndarray: 分割结果
     """
     sh = features.shape
     if features.ndim > 2:
