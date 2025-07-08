@@ -1,12 +1,3 @@
-[project]
-name = "cedar"
-
-[tool.pyright]
-extraPaths = ["."]
-ignore = [
-    "**/__init__.py",
-]
-
 [tool.ruff]
 exclude = [
     "dist"
