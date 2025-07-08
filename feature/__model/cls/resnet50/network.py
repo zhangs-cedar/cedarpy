@@ -23,7 +23,7 @@ class MultiFeatureNet(nn.Module):
         self.fcfeature = nn.Linear(in_features=72, out_features=512)
         self.fc2 = nn.Linear(in_features=1024, out_features=num_class)
         if device is None:
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         else:
             self.device = device
 
@@ -60,9 +60,9 @@ class MultiFeatureNet(nn.Module):
         self.train()
         loss_sum = 0
         for i, sample in enumerate(dataloader):
-            input = sample["image"].to(self.device)
-            label = sample["label"].to(self.device)
-            feature = sample["feature"].to(self.device)
+            input = sample['image'].to(self.device)
+            label = sample['label'].to(self.device)
+            feature = sample['feature'].to(self.device)
             optimizer.zero_grad()
             output = self.forward(input, feature)
             _, pred = torch.max(output, dim=1)
@@ -71,7 +71,7 @@ class MultiFeatureNet(nn.Module):
             loss.backward()
             optimizer.step()
             loss_sum += float(loss.item())  # 简化了 loss 的处理
-        lr = optimizer.param_groups[0]["lr"]
+        lr = optimizer.param_groups[0]['lr']
         return loss_sum / len(dataloader), lr
 
     def eval_one_epoch(self, dataloader):
@@ -87,9 +87,9 @@ class MultiFeatureNet(nn.Module):
         eval_trues = []
         with torch.no_grad():
             for i, sample in enumerate(dataloader):
-                input = sample["image"].to(self.device).requires_grad_(True)
-                label = sample["label"].to(self.device).requires_grad_(True)
-                feature = sample["feature"].to(self.device).requires_grad_(True)
+                input = sample['image'].to(self.device).requires_grad_(True)
+                label = sample['label'].to(self.device).requires_grad_(True)
+                feature = sample['feature'].to(self.device).requires_grad_(True)
                 output = self(input, feature).requires_grad_(True)
                 _, pred = torch.max(output, dim=1)
                 eval_preds.extend(pred.cpu().numpy().tolist())
@@ -105,43 +105,46 @@ class MultiFeatureNet(nn.Module):
         # 保存间隔轮数
         save_interval_epochs=5,
         # 训练数据集
-        train_loader="DataLoader(train_dataset, batch_size=64, shuffle=True)",
+        train_loader='DataLoader(train_dataset, batch_size=64, shuffle=True)',
         # 评估数据集
-        eval_loader="DataLoader(eval_dataset, batch_size=64)",
+        eval_loader='DataLoader(eval_dataset, batch_size=64)',
         # 优化器
-        optimizer="torch.optim.Adam(model.parameters(), lr=0.0001)",
+        optimizer='torch.optim.Adam(model.parameters(), lr=0.0001)',
         # 损失函数
-        criterion="nn.CrossEntropyLoss()",
+        criterion='nn.CrossEntropyLoss()',
         # 保存目录
-        save_dir="output",
+        save_dir='output',
     ):
         """训练模型"""
         train_log = {
-            "loss": [],
-            "lr": [],
-            "eval_acc": [],
+            'loss': [],
+            'lr': [],
+            'eval_acc': [],
         }
         best_eval_acc = 0
         for epoch in range(num_epochs):
             loss, lr = self.train_one_epoch(train_loader, criterion, optimizer)
-            print("Epoch: {}, loss: {:.4f}, lr: {:.6f}".format(epoch + 1, loss, lr))
+            print('Epoch: {}, loss: {:.4f}, lr: {:.6f}'.format(epoch + 1, loss, lr))
             if (epoch + 1) % save_interval_epochs == 0:
-                torch.save(self.state_dict(), os.path.join(save_dir, "model_{}.pth".format(epoch + 1)))
+                torch.save(
+                    self.state_dict(),
+                    os.path.join(save_dir, 'model_{}.pth'.format(epoch + 1)),
+                )
 
             eval_acc = self.eval_one_epoch(self, eval_loader)
-            print("Eval Acc: {:.4f}".format(eval_acc))
+            print('Eval Acc: {:.4f}'.format(eval_acc))
             # 保存最好的模型
             if eval_acc > best_eval_acc:
                 best_eval_acc = eval_acc
-                torch.save(self.state_dict(), os.path.join(save_dir, "best_model.pth"))
+                torch.save(self.state_dict(), os.path.join(save_dir, 'best_model.pth'))
 
-            train_log["loss"].append(loss)
-            train_log["lr"].append(lr)
-            train_log["eval_acc"].append(eval_acc)
+            train_log['loss'].append(loss)
+            train_log['lr'].append(lr)
+            train_log['eval_acc'].append(eval_acc)
 
         # 保存训练日志的表
         df = pd.DataFrame(train_log)
-        df.to_csv(os.path.join(save_dir, "train_log.csv"), index=False)
+        df.to_csv(os.path.join(save_dir, 'train_log.csv'), index=False)
 
     def model_load(self, model_path):
         """加载模型"""
@@ -175,7 +178,7 @@ class MultiFeatureNet(nn.Module):
 
 @timeit
 def test_01():
-    print("测试代码 推理代码测试")
+    print('测试代码 推理代码测试')
     model = MultiFeatureNet(num_class=2)  # 实例化模型
     # 模拟数据
     input = torch.randn(5, 3, 256, 256)
@@ -185,18 +188,21 @@ def test_01():
 
 
 def test_02():
-    print("测试代码 训练代码测试")
+    print('测试代码 训练代码测试')
     model = MultiFeatureNet(num_class=2)  # 实例化模型
     # 模拟数据
 
     class MyDataset(Dataset):
-
         def __getitem__(self, idx):
             sample_image = np.random.randn(3, 256, 256).astype(np.float32)
             sample_feature = np.random.randn(72).astype(np.float32)
             sample_label = np.array([1], dtype=np.float32)
 
-            sample = {"image": copy.deepcopy(sample_image), "feature": copy.deepcopy(sample_feature), "label": copy.deepcopy(sample_label)}
+            sample = {
+                'image': copy.deepcopy(sample_image),
+                'feature': copy.deepcopy(sample_feature),
+                'label': copy.deepcopy(sample_label),
+            }
             return sample
 
         def __len__(self):
@@ -211,10 +217,10 @@ def test_02():
         eval_loader=DataLoader(md, batch_size=2),
         optimizer=torch.optim.Adam(model.parameters(), lr=0.0001),
         criterion=nn.CrossEntropyLoss(),
-        save_dir="output",
+        save_dir='output',
     )
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # test_01()
     test_02()

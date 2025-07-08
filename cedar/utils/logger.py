@@ -23,26 +23,26 @@ def init_logger(name: str = __name__, log_file: Optional[str] = None, log_level:
         AssertionError: 当日志记录器被重复初始化时
     """
     global _logger
-    assert _logger is None, "logger should not be initialized twice or more."
+    assert _logger is None, 'logger should not be initialized twice or more.'
     _logger = logging.getLogger(name)
 
-    formatter = logging.Formatter("[%(asctime)s] %(name)s %(levelname)s: %(message)s", datefmt="%Y/%m/%d %H:%M:%S")
+    formatter = logging.Formatter('[%(asctime)s] %(name)s %(levelname)s: %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
 
     stream_handler = logging.StreamHandler(stream=sys.stdout)
     stream_handler.setFormatter(formatter)
     _logger.addHandler(stream_handler)
 
     if log_file is None:
-        log_file = f"./{create_name()}.log"
+        log_file = f'./{create_name()}.log'
 
     log_file_folder = os.path.split(log_file)[0]
     os.makedirs(log_file_folder, exist_ok=True)
 
-    file_handler = logging.FileHandler(log_file, encoding="utf8")
+    file_handler = logging.FileHandler(log_file, encoding='utf8')
     file_handler.setFormatter(formatter)
     _logger.addHandler(file_handler)
     _logger.setLevel(log_level)
-    _logger.warning("Initialize logger")
+    _logger.warning('Initialize logger')
 
 
 def info(fmt: str, *args: Any) -> None:

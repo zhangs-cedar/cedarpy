@@ -33,7 +33,11 @@ def _texture_filter(gaussian_filtered: np.ndarray) -> Tuple[np.ndarray, ...]:
 
 
 def _singlescale_basic_features_singlechannel(
-    img: np.ndarray, sigma: float, intensity: bool = True, edges: bool = True, texture: bool = True
+    img: np.ndarray,
+    sigma: float,
+    intensity: bool = True,
+    edges: bool = True,
+    texture: bool = True,
 ) -> Tuple[np.ndarray, ...]:
     """单尺度单通道基础特征提取
 
@@ -147,7 +151,7 @@ def multiscale_basic_features(
         ValueError: 当所有特征类型都为False时
     """
     if not any([intensity, edges, texture]):
-        raise ValueError("At least one of `intensity`, `edges` or `textures` " "must be True for features to be computed.")
+        raise ValueError('At least one of `intensity`, `edges` or `textures` ' 'must be True for features to be computed.')
 
     if channel_axis is None:
         image = image[..., np.newaxis]

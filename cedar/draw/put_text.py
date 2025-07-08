@@ -28,7 +28,7 @@ def putText(
     if isinstance(img, np.ndarray):
         img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     elif not isinstance(img, Image.Image):
-        raise ValueError("img must be np.ndarray or PIL.Image.Image")
+        raise ValueError('img must be np.ndarray or PIL.Image.Image')
 
     draw = ImageDraw.Draw(img)
     # Use default font (Arial) if "simsun.ttc" is not available
@@ -37,8 +37,8 @@ def putText(
         script_path = os.path.abspath(__file__)
         # 获取当前脚本文件所在的目录
         script_directory = os.path.dirname(script_path)
-        font_path = os.path.join(script_directory, "simsun.ttc")
-        font_style = ImageFont.truetype(font_path, text_size, encoding="utf-8")
+        font_path = os.path.join(script_directory, 'simsun.ttc')
+        font_style = ImageFont.truetype(font_path, text_size, encoding='utf-8')
     except IOError:
         font_style = ImageFont.load_default()
 

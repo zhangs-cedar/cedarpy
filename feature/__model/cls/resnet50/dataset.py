@@ -18,31 +18,31 @@ def cls_split(data_dir, train_split=0.8):
         if osp.isdir(path):
             labels.append(names)
 
-    with open(osp.join(data_dir, "labels.txt"), "w") as f:
+    with open(osp.join(data_dir, 'labels.txt'), 'w') as f:
         for label in labels:
-            f.write(label + "\n")
-    print("labels.txt created {}".format(labels))
+            f.write(label + '\n')
+    print('labels.txt created {}'.format(labels))
 
     img_list = []
     for idx, label in enumerate(labels):
         for img_name in os.listdir(osp.join(data_dir, label)):
-            img_list.append(label + "/" + img_name + " " + str(idx))
+            img_list.append(label + '/' + img_name + ' ' + str(idx))
 
     random.shuffle(img_list)
     num = len(img_list)
     train_list = img_list[: int(num * train_split)]
     val_list = img_list[int(num * train_split) :]
 
-    with open(osp.join(data_dir, "train.txt"), "w") as f:
+    with open(osp.join(data_dir, 'train.txt'), 'w') as f:
         for img in train_list:
-            f.write(f"{img}\n")
+            f.write(f'{img}\n')
 
-    with open(osp.join(data_dir, "val.txt"), "w") as f:
+    with open(osp.join(data_dir, 'val.txt'), 'w') as f:
         for img in val_list:
-            f.write(f"{img}\n")
+            f.write(f'{img}\n')
 
-    print("train.txt created {}".format(train_list))
-    print("val.txt created {}".format(val_list))
+    print('train.txt created {}'.format(train_list))
+    print('val.txt created {}'.format(val_list))
 
 
 class MyDataset(Dataset):
@@ -73,13 +73,13 @@ class MyDataset(Dataset):
                     continue
                 self.file_list.append(
                     {
-                        "file": full_path,
-                        "label": np.asarray(items[1], dtype=np.int64),
-                        "feature": "get_feature",
+                        'file': full_path,
+                        'label': np.asarray(items[1], dtype=np.int64),
+                        'feature': 'get_feature',
                     }
                 )
         self.num = len(self.file_list)
-        print(f"{self.num} images loaded from {data_dir}")
+        print(f'{self.num} images loaded from {data_dir}')
 
     def __getitem__(self, idx):
         """
@@ -92,7 +92,7 @@ class MyDataset(Dataset):
         return len(self.file_list)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     """ """
     train_transforms = T.Compose(
         [
@@ -104,9 +104,9 @@ if __name__ == "__main__":
     )
 
     train_dataset = MyDataset(
-        data_dir="./dataset/train",
-        file_list="./dataset/train.txt",
-        label_list="./dataset/labels.txt",
+        data_dir='./dataset/train',
+        file_list='./dataset/train.txt',
+        label_list='./dataset/labels.txt',
         transforms=train_transforms,
     )
 

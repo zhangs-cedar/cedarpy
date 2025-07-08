@@ -21,7 +21,7 @@ def roate_image(img: np.ndarray, angle: float, border_value: Tuple[int, int, int
         ValueError: 当图像为空时
     """
     if img is None:
-        raise ValueError("图像不能为空")
+        raise ValueError('图像不能为空')
 
     h, w = img.shape[:2]
     c_x, c_y = w // 2, h // 2

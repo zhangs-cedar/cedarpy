@@ -18,7 +18,7 @@ def create_name() -> str:
     Returns:
         str: 格式化的时间字符串，格式为 YYYY-MM-DD_HH-MM-SS-ffffff
     """
-    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+    return datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')
 
 
 def split_filename(filename: str) -> Tuple[str, str]:
@@ -36,8 +36,8 @@ def split_filename(filename: str) -> Tuple[str, str]:
         >>> split_filename("test.jpg")
         ('test', '.jpg')
     """
-    name = filename.rsplit(".", 1)[0]
-    suffix = "." + filename.rsplit(".", 1)[1]
+    name = filename.rsplit('.', 1)[0]
+    suffix = '.' + filename.rsplit('.', 1)[1]
     return name, suffix
 
 
@@ -54,7 +54,7 @@ def rmtree_makedirs(*directories: str) -> None:
         if osp.exists(directory):
             shutil.rmtree(directory)
         os.makedirs(directory)
-        print(f"[Method {rmtree_makedirs.__name__}], Create dir {directory}")
+        print(f'[Method {rmtree_makedirs.__name__}], Create dir {directory}')
 
 
 def timeit(func):
@@ -72,10 +72,10 @@ def timeit(func):
         start = time.time()
         try:
             result = func(*args, **kwargs)
-            print(f"[Method {func.__name__}], FINISH Time {round((time.time() - start), 4)} s: \n")
+            print(f'[Method {func.__name__}], FINISH Time {round((time.time() - start), 4)} s: \n')
             return result
         except Exception as e:
-            error_trace = str(traceback.format_exc()).split("func(*args, **kwargs)")[-1].split("decorated")[0]
+            error_trace = str(traceback.format_exc()).split('func(*args, **kwargs)')[-1].split('decorated')[0]
             print(error_trace)
             exit(0)
 
@@ -89,8 +89,8 @@ def set_timeit_env(debug: bool = True) -> None:
         debug: 是否启用调试模式，默认为True
     """
     debug_str = str(debug)
-    os.environ["timeit_debug"] = debug_str
-    print(f"环境变量 timeit_debug 已设置为 {debug_str}")
+    os.environ['timeit_debug'] = debug_str
+    print(f'环境变量 timeit_debug 已设置为 {debug_str}')
 
 
 def run_subprocess(cmd: Union[str, List[str]], cwd: Optional[str] = None) -> Tuple[subprocess.Popen, bytes, bytes]:
@@ -128,8 +128,8 @@ def get_file_md5(filename: str) -> str:
         FileNotFoundError: 当文件不存在时
     """
     hash_md5 = hashlib.md5()
-    with open(filename, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
+    with open(filename, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b''):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
@@ -202,7 +202,7 @@ def copy_file(src_path: str, dst_dir: str, filename: Optional[str] = None) -> No
     shutil.copy(src_path, dst_path)
 
 
-def get_files_list(input_path: str, find_suffix: Optional[List[str]] = None, sortby: str = "name") -> List[Dict[str, Any]]:
+def get_files_list(input_path: str, find_suffix: Optional[List[str]] = None, sortby: str = 'name') -> List[Dict[str, Any]]:
     """获取文件列表
 
     Args:
@@ -229,7 +229,7 @@ def get_files_list(input_path: str, find_suffix: Optional[List[str]] = None, sor
                 file_path = os.path.join(root, file)
                 filepath_list.append(file_path)
     else:
-        raise ValueError("Input path must be a file or directory.")
+        raise ValueError('Input path must be a file or directory.')
 
     files_list: List[Dict[str, Any]] = []
     for file_path in filepath_list:
@@ -243,12 +243,12 @@ def get_files_list(input_path: str, find_suffix: Optional[List[str]] = None, sor
 
         modification_time = osp.getmtime(file_path)
         file_info = {
-            "name": name,
-            "suffix": suffix,
-            "names": names,
-            "path": file_path,
-            "root": root,
-            "modification_time": datetime.fromtimestamp(modification_time),
+            'name': name,
+            'suffix': suffix,
+            'names': names,
+            'path': file_path,
+            'root': root,
+            'modification_time': datetime.fromtimestamp(modification_time),
         }
         files_list.append(file_info)
 

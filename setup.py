@@ -1,18 +1,18 @@
 import setuptools
 
-__version__ = "1.0.0"
+__version__ = '1.0.0'
 
 setuptools.setup(
-    name="cedar",  # 模块名称
+    name='cedar',  # 模块名称
     version=__version__,  # 当前版本
-    author="zhangsong",  # 作者
-    author_email="",  # 作者邮箱
-    description="",  # 模块简介ma
-    long_description="",  # 模块详细介绍
-    long_description_content_type="",  # 模块详细介绍格式
+    author='zhangsong',  # 作者
+    author_email='',  # 作者邮箱
+    description='',  # 模块简介ma
+    long_description='',  # 模块详细介绍
+    long_description_content_type='',  # 模块详细介绍格式
     packages=setuptools.find_packages(),  # 自动找到项目中导入的模块
     package_data={
-        "cedar.draw": ["simsun.ttc"],
+        'cedar.draw': ['simsun.ttc'],
     },
     # 模块相关的元数据
     classifiers=[],
@@ -20,5 +20,5 @@ setuptools.setup(
     install_requires=[
         # "numpy",
     ],
-    python_requires=">=3.6",
+    python_requires='>=3.6',
 )

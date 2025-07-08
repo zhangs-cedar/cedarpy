@@ -26,7 +26,7 @@ def check_xml(img_file: Union[str, np.ndarray], xml_file: Union[str, et.ElementT
     elif isinstance(img_file, np.ndarray):
         img = img_file
     else:
-        raise TypeError("img_file must be str or np.ndarray")
+        raise TypeError('img_file must be str or np.ndarray')
 
     # 处理XML文件
     if isinstance(xml_file, str):
@@ -34,7 +34,7 @@ def check_xml(img_file: Union[str, np.ndarray], xml_file: Union[str, et.ElementT
     elif isinstance(xml_file, et.ElementTree):
         parsexml = xml_file
     else:
-        raise TypeError("xml_file must be str or et.ElementTree")
+        raise TypeError('xml_file must be str or et.ElementTree')
 
     # 获取图像尺寸
     row_width, col_width = img.shape[:2]
@@ -43,12 +43,12 @@ def check_xml(img_file: Union[str, np.ndarray], xml_file: Union[str, et.ElementT
     root = parsexml.getroot()
 
     # 获取XML中记录的图像尺寸
-    size_element = root.find("size")
+    size_element = root.find('size')
     if size_element is None:
         return False
 
-    width_element = size_element.find("width")
-    height_element = size_element.find("height")
+    width_element = size_element.find('width')
+    height_element = size_element.find('height')
 
     if width_element is None or height_element is None:
         return False
@@ -61,21 +61,21 @@ def check_xml(img_file: Union[str, np.ndarray], xml_file: Union[str, et.ElementT
         return False
 
     # 检查是否有标注对象
-    objects = root.findall("object")
+    objects = root.findall('object')
     if len(objects) == 0:
         return False
 
     # 检查每个标注框
     for obj in objects:
-        bndbox = obj.find("bndbox")
+        bndbox = obj.find('bndbox')
         if bndbox is None:
             return False
 
         # 获取边界框坐标
-        xmin_element = bndbox.find("xmin")
-        xmax_element = bndbox.find("xmax")
-        ymin_element = bndbox.find("ymin")
-        ymax_element = bndbox.find("ymax")
+        xmin_element = bndbox.find('xmin')
+        xmax_element = bndbox.find('xmax')
+        ymin_element = bndbox.find('ymin')
+        ymax_element = bndbox.find('ymax')
 
         if any(elem is None for elem in [xmin_element, xmax_element, ymin_element, ymax_element]):
             return False

@@ -22,14 +22,14 @@ def get_labels(xml_path: str, img_width: int, img_height: int) -> np.ndarray:
     parsexml = et.parse(xml_path)
     root = parsexml.getroot()
     labels = np.zeros((img_height, img_width), dtype=np.uint8)
-    for obj in root.findall("object"):
-        name = obj.find("name").text
-        bndbox = obj.find("bndbox")
-        xmin = int(bndbox.find("xmin").text)
-        xmax = int(bndbox.find("xmax").text)
-        ymin = int(bndbox.find("ymin").text)
-        ymax = int(bndbox.find("ymax").text)
-        if name == "other":
+    for obj in root.findall('object'):
+        name = obj.find('name').text
+        bndbox = obj.find('bndbox')
+        xmin = int(bndbox.find('xmin').text)
+        xmax = int(bndbox.find('xmax').text)
+        ymin = int(bndbox.find('ymin').text)
+        ymax = int(bndbox.find('ymax').text)
+        if name == 'other':
             labels[ymin:ymax, xmin:xmax] = 1
         else:
             labels[ymin:ymax, xmin:xmax] = 2
@@ -49,16 +49,16 @@ def DataLoader(train_dir: str, img_width: int) -> Tuple[np.ndarray, np.ndarray]:
         图像和标签的格式为: (图像, 标签)
         图像和标签经过两次cv2.pyrDown() 压缩, 图像的尺寸为: (img_width, img_height)
     """
-    img_dir = os.path.join(train_dir, "img")
-    xml_dir = os.path.join(train_dir, "xml")
+    img_dir = os.path.join(train_dir, 'img')
+    xml_dir = os.path.join(train_dir, 'xml')
     img_names = os.listdir(img_dir)
-    logging.info(f"loading data... {len(img_names)} images")
+    logging.info(f'loading data... {len(img_names)} images')
     training_imgs = None
     training_labels = None
     for idx, img_name in enumerate(img_names):
         name, _ = split_filename(img_name)
         img_path = os.path.join(img_dir, img_name)
-        xml_path = os.path.join(xml_dir, name + ".xml")
+        xml_path = os.path.join(xml_dir, name + '.xml')
         _img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), 1)
         img_height = _img.shape[0]
         img = np.zeros((img_height, img_width, 3), dtype=np.uint8)
@@ -83,7 +83,7 @@ def load_model(filepath: str) -> Any:
         Any: 加载的模型对象
     """
     model = joblib.load(filepath)
-    logging.info(f"[Method load_model], model loaded from {filepath}")
+    logging.info(f'[Method load_model], model loaded from {filepath}')
     return model
 
 
@@ -95,7 +95,7 @@ def save_model(model: Any, filepath: str) -> None:
         filepath: 保存路径
     """
     joblib.dump(model, filepath)
-    logging.info(f"[Method save_model], model saved to {filepath}")
+    logging.info(f'[Method save_model], model saved to {filepath}')
 
 
 def fit_segmenter(labels: np.ndarray, features: np.ndarray, clf: Any) -> Any:
@@ -134,8 +134,8 @@ def predict_segmenter(features: np.ndarray, clf: Any) -> np.ndarray:
     try:
         predicted_labels = clf.predict(features)
     except ValueError as err:
-        if err.args and "x must consist of vectors of length" in err.args[0]:
-            raise ValueError(err.args[0] + "\n" + "Maybe you did not use the same type of features for training the classifier.")
+        if err.args and 'x must consist of vectors of length' in err.args[0]:
+            raise ValueError(err.args[0] + '\n' + 'Maybe you did not use the same type of features for training the classifier.')
         else:
             raise err
     output = predicted_labels.reshape(sh[:-1])

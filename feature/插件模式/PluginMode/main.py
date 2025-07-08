@@ -2,11 +2,11 @@ from plugins.plugin_manager import PluginManager
 
 
 # 使用示例
-if __name__ == "__main__":
+if __name__ == '__main__':
     # 方式1：通过配置文件路径初始化
-    config_path = "/Users/zhangsong/workspace/OpenSource/cedarpy/feature/插件模式/PluginMode/config.json"
+    config_path = '/Users/zhangsong/workspace/OpenSource/cedarpy/feature/插件模式/PluginMode/config.json'
     plugin_manager = PluginManager(config_path=config_path)
-    data = {"title": "test", "content": "test content"}
+    data = {'title': 'test', 'content': 'test content'}
     result = plugin_manager.execute_all_plugins(data)
     print(result)
 

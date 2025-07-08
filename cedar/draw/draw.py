@@ -9,7 +9,7 @@ def draw_lines(
     row_lines: List[int],
     col_lines: List[int],
     color: Union[Tuple[int, int, int], int],
-    thickness: Union[int, str] = "auto",
+    thickness: Union[int, str] = 'auto',
 ) -> np.ndarray:
     """绘制行列线
 
@@ -29,14 +29,14 @@ def draw_lines(
     if img.ndim == 2:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     if img.ndim != 3:
-        raise ValueError(f"img must be 3-dim, got shape: {img.shape}")
+        raise ValueError(f'img must be 3-dim, got shape: {img.shape}')
     if isinstance(color, tuple):
         color_bgr = color
     elif isinstance(color, int):
         color_bgr = tuple(color_list[color])
     else:
-        raise ValueError("color must be tuple or int")
-    if thickness == "auto":
+        raise ValueError('color must be tuple or int')
+    if thickness == 'auto':
         thickness = max(int(img.shape[0] / 1000), 1)
     elif not isinstance(thickness, int):
         raise ValueError("thickness must be int or 'auto'")

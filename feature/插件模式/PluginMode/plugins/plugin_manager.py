@@ -64,10 +64,10 @@ class PluginManager:
             return self.config_data
         elif self.config_path:
             # 如果传入了配置文件路径，则从文件加载
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         else:
-            raise ValueError("Either config_path or config_data must be provided")
+            raise ValueError('Either config_path or config_data must be provided')
 
     def init_plugins(self):
         """
@@ -75,14 +75,14 @@ class PluginManager:
         """
         plugin_configs = self.load_config()
         # 按优先级排序
-        plugin_configs.sort(key=lambda x: x["priority"], reverse=True)
+        plugin_configs.sort(key=lambda x: x['priority'], reverse=True)
         # 挑选enabled为true的插件
-        plugin_configs = [x for x in plugin_configs if x["enabled"]]
+        plugin_configs = [x for x in plugin_configs if x['enabled']]
         # 初始化所有插件
         plugins_map = {}
         for config in plugin_configs:
             # print(f"[Initializing plugin]: {config['name']}")
-            plugins_map[config["name"]] = eval(config["name"])(plugin_config=config, all_config=self.all_config)
+            plugins_map[config['name']] = eval(config['name'])(plugin_config=config, all_config=self.all_config)
         return plugins_map
 
     def execute_all_plugins(self, data):

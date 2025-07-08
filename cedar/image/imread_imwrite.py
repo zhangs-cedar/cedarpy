@@ -24,7 +24,7 @@ def imread(image_path: str, flag: int = cv2.IMREAD_COLOR) -> np.ndarray:
     """
     img = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), flag)
     if img is None:
-        raise FileNotFoundError(f"无法读取图片文件: {image_path}")
+        raise FileNotFoundError(f'无法读取图片文件: {image_path}')
     return img
 
 
@@ -40,7 +40,7 @@ def imwrite(image_path: str, img: np.ndarray, plt: bool = False) -> None:
         ValueError: 当图片矩阵为空时
     """
     if img is None:
-        raise ValueError("图片矩阵不能为空")
+        raise ValueError('图片矩阵不能为空')
 
     if plt:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

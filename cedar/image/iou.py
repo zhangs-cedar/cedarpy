@@ -17,7 +17,7 @@ def calculate_iou(box1: Tuple[float, float, float, float], box2: Tuple[float, fl
         ValueError: 当输入参数格式不正确时
     """
     if len(box1) != 4 or len(box2) != 4:
-        raise ValueError("边界框必须包含4个元素: (x, y, width, height)")
+        raise ValueError('边界框必须包含4个元素: (x, y, width, height)')
 
     x1, y1, w1, h1 = box1
     x2, y2, w2, h2 = box2
@@ -59,14 +59,14 @@ def merge_boxes(boxes: List[List[float]], iou_threshold: float) -> List[List[flo
         return []
 
     if iou_threshold < 0 or iou_threshold > 1:
-        raise ValueError("IoU阈值必须在[0, 1]范围内")
+        raise ValueError('IoU阈值必须在[0, 1]范围内')
 
     merged_boxes = []
 
     # 遍历所有边界框
     for i, box in enumerate(boxes):
         if len(box) != 4:
-            raise ValueError(f"边界框 {i} 必须包含4个元素: [x, y, width, height]")
+            raise ValueError(f'边界框 {i} 必须包含4个元素: [x, y, width, height]')
 
         # 检查当前边界框是否与其他边界框重叠
         overlapped = False

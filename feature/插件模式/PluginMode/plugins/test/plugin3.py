@@ -11,6 +11,6 @@ class Plugin3(PluginBase):
         """插件执行体"""
         if not self.init_tag:
             self.init()
-        print("[Plugin]: {} execute!".format(self.name))
+        print('[Plugin]: {} execute!'.format(self.name))
         # 执行 data 处理
         return data
