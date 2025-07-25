@@ -15,11 +15,15 @@ def print(*args, sep=' ', end='\n', file=None):
     # 在输出前添加一个前缀
     # 获取当前时间
     current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    prefix = f'[Print] [{current_time}]   '  # 添加时间戳到日志内容
+    prefix = f'[{current_time}]   '  # 添加时间戳到日志内容
     output_with_type = []
     for arg in args:
         arg_type = type(arg).__name__
-        output_with_type.append(f'({arg_type}) {arg}    ')
+        # 如果arg是字符串，则添加颜色,不需要加（str）提示
+        if isinstance(arg, str):
+            output_with_type.append(f'{arg}    ')
+        else:
+            output_with_type.append(f'({arg_type}) {arg}    ')
     output = sep.join(output_with_type)
     output = prefix + output
     original_print(output, end=end)

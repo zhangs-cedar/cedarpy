@@ -11,9 +11,48 @@ from datetime import datetime
 from typing import Optional, List, Tuple, Union, Any, Dict
 
 
-def create_name():
-    strtime = datetime.now().strftime('%Y-%m-%d_%H-%M-%S-%f')  # 格式化日期时间，年月日时分秒毫秒
-    return strtime
+def create_name(format_type='standard'):
+    """创建基于当前时间的名字
+
+    Args:
+        format_type (str): 时间格式类型，可选值：
+            - 'full': 包含毫秒的完整格式 (默认)
+            - 'standard': 标准格式，不包含毫秒
+            - 'date_only': 仅包含日期
+            - 'time_only': 仅包含时间
+            - 'compact': 紧凑格式，无分隔符
+
+    Returns:
+        str: 格式化后的时间字符串
+
+    Examples:
+        >>> create_name()
+        '2025-01-27_14-30-45-123456'
+        >>> create_name('standard')
+        '2025-01-27_14-30-45'
+        >>> create_name('date_only')
+        '2025-01-27'
+        >>> create_name('time_only')
+        '14-30-45'
+        >>> create_name('compact')
+        '20250127143045123456'
+    """
+    now = datetime.now()
+
+    if format_type == 'full':
+        return now.strftime('%Y-%m-%d_%H-%M-%S-%f')
+    elif format_type == 'standard':
+        return now.strftime('%Y-%m-%d_%H-%M-%S')
+    elif format_type == 'date_only':
+        return now.strftime('%Y-%m-%d')
+    elif format_type == 'time_only':
+        return now.strftime('%H-%M-%S')
+    elif format_type == 'compact':
+        return now.strftime('%Y%m%d%H%M%S%f')
+    else:
+        raise ValueError(
+            f'Unsupported format_type: {format_type}. ' f"Supported types: 'full', 'standard', 'date_only', 'time_only', 'compact'"
+        )
 
 
 def split_filename(filename: str) -> tuple:
