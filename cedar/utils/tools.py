@@ -9,6 +9,7 @@ import subprocess
 from functools import wraps
 from datetime import datetime
 from typing import Optional, List, Tuple, Union, Any, Dict
+from cedar.utils.s_print import print
 
 
 def create_name(format_type='standard'):
@@ -21,21 +22,6 @@ def create_name(format_type='standard'):
             - 'date_only': 仅包含日期
             - 'time_only': 仅包含时间
             - 'compact': 紧凑格式，无分隔符
-
-    Returns:
-        str: 格式化后的时间字符串
-
-    Examples:
-        >>> create_name()
-        '2025-01-27_14-30-45-123456'
-        >>> create_name('standard')
-        '2025-01-27_14-30-45'
-        >>> create_name('date_only')
-        '2025-01-27'
-        >>> create_name('time_only')
-        '14-30-45'
-        >>> create_name('compact')
-        '20250127143045123456'
     """
     now = datetime.now()
 
@@ -95,26 +81,25 @@ def timeit(func):
         start = time.time()
         try:
             res = func(*args, **kwargs)
-            if os.getenv('timeit_debug', 'false').lower() == 'true':
-                print('[Method {}], FINISH Time {} s: \n'.format(func.__name__, round((time.time() - start), 4)))
+            print('[Method {}], FINISH Time {} s: \n'.format(func.__name__, round((time.time() - start), 4)))
             return res
         except Exception as e:
-            if os.getenv('timeit_debug', 'false').lower() == 'true':
-                print(str(traceback.format_exc()).split('func(*args, **kwargs)')[-1].split('decorated')[0])
-            exit(0)
+            print(str(traceback.format_exc()).split('func(*args, **kwargs)')[-1].split('decorated')[0])
+            raise
 
     return decorated
 
 
-def set_timeit_env(debug=True):
-    """
-    设置或修改环境变量timeit_debug
-    """
-    # 将 debug 参数转换为字符串
-    debug_str = str(debug)
-    # 直接设置环境变量 timeit_debug 的值
-    os.environ['timeit_debug'] = debug_str
-    print(f'环境变量 timeit_debug 已设置为 {debug_str}')
+def try_except(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print(str(traceback.format_exc()).split('func(*args, **kwargs)')[-1].split('decorated')[0])
+            raise
+
+    return decorated
 
 
 def run_subprocess(cmd, cwd=None):
