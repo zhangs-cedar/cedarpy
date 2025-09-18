@@ -1,8 +1,17 @@
 {
     "preprocess": [
         {
-            "name": "Plugin1",
-            "__name__": "插件名称",
+            "plugin_name": "Plugin1",
+            "__plugin_name__": "插件名称",
+            "__enabled__": "是否启用插件",
+            "config": {
+                "123": 123
+            },
+            "__config__": "插件配置信息"
+        },
+        {
+            "plugin_name": "Plugin1",
+            "__plugin_name__": "插件名称",
             "enabled": true,
             "__enabled__": "是否启用插件",
             "priority": 99,
@@ -13,7 +22,7 @@
             "__config__": "插件配置信息"
         },
         {
-            "name": "Plugin2",
+            "plugin_name": "Plugin2",
             "enabled": true,
             "priority": 99,
             "config": {
@@ -21,7 +30,7 @@
             }
         },
         {
-            "name": "Plugin3",
+            "plugin_name": "Plugin3",
             "enabled": true,
             "priority": 100,
             "config": {
@@ -31,7 +40,7 @@
     ],
     "postprocess": [
         {
-            "name": "Plugin2",
+            "plugin_name": "Plugin2",
             "enabled": true,
             "priority": 99,
             "config": {
@@ -39,7 +48,7 @@
             }
         },
         {
-            "name": "Plugin3",
+            "plugin_name": "Plugin3",
             "enabled": true,
             "priority": 100,
             "config": {

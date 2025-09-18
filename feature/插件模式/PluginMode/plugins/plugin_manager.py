@@ -2,14 +2,20 @@ import json
 from .plugin_all_cls import *
 
 
+def get_nested_value(d: dict, *keys: str, default=None):
+    """安全地从嵌套字典中获取值。
+    """
+    for key in keys:
+        if isinstance(d, dict) and key in d:
+            d = d[key]
+        else:
+            return default
+    return d
+
+
 class PluginManager:
     """
-    # 方式1：通过配置文件路径初始化
-    config_path = "config.json"
-    plugin_manager = PluginManager(config_path=config_path)
-    data = {"title": "test", "content": "test content"}
-    result = plugin_manager.execute_all_plugins(data)
-    print(result)
+    插件管理器
     """
 
     def __init__(self, config_path=None, config_data=None, all_config=None):
@@ -49,20 +55,19 @@ class PluginManager:
         for stage, plugin_configs in config.items():
             stage_plugins = []
             # 按优先级排序
-            plugin_configs.sort(key=lambda x: x['priority'], reverse=True)
+            plugin_configs.sort(key=lambda x: get_nested_value(x, 'priority', default=0), reverse=True)
             # 只处理enabled的插件
-            enabled_configs = [x for x in plugin_configs if x['enabled']]
+            enabled_configs = [x for x in plugin_configs if get_nested_value(x, 'enabled', default=False)]
 
             for plugin_config in enabled_configs:
-                plugin_name = plugin_config['name']
+                plugin_name = get_nested_value(plugin_config, 'plugin_name', default='noplugin_name')
+                if not plugin_name:
+                    continue
                 plugin_instance = eval(plugin_name)(
                     plugin_config=plugin_config, all_config=self.all_config)
-                stage_plugins.append(
-                    (plugin_config['priority'], plugin_instance))
-
+                priority = get_nested_value(plugin_config, 'priority', default=0)
+                stage_plugins.append((priority, plugin_instance))
             plugins_map[stage] = stage_plugins
-
-        print(plugins_map)
 
         return plugins_map
 
@@ -72,6 +77,6 @@ class PluginManager:
         """
         for stage in self.plugins_map.keys():
             for priority, plugin in self.plugins_map[stage]:
-                print(f"执行阶段: {stage}, 插件: {plugin.name}, 优先级: {priority}")
+                print(f"执行阶段: {stage}, 插件: {plugin.plugin_name}, 优先级: {priority}")
                 data = plugin.execute(data)
         return data
