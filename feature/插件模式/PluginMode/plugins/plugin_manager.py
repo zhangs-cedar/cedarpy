@@ -10,36 +10,6 @@ class PluginManager:
     data = {"title": "test", "content": "test content"}
     result = plugin_manager.execute_all_plugins(data)
     print(result)
-
-    # 方式2：通过已解析好的配置数据初始化
-    config_data = [
-        {
-            "name": "Plugin1",
-            "__name__": "插件名称",
-            "enabled": True,
-            "__enabled__": "是否启用插件",
-            "priority": 99,
-            "__priority__": "插件优先级",
-            "config": {"123": 123},
-            "__config__": "插件配置信息"
-        },
-        {
-            "name": "Plugin2",
-            "enabled": False,
-            "priority": 99,
-            "config": {"123": 123}
-        },
-        {
-            "name": "Plugin3",
-            "enabled": True,
-            "priority": 100,
-            "config": {"123": 123}
-        }
-    ]
-    plugin_manager = PluginManager(config_data=config_data)
-    data = {"title": "test", "content": "test content"}
-    result = plugin_manager.execute_all_plugins(data)
-    print(result)
     """
 
     def __init__(self, config_path=None, config_data=None, all_config=None):
@@ -60,37 +30,48 @@ class PluginManager:
         :return: 配置数据
         """
         if self.config_data:
-            # 如果直接传入了配置数据，则直接使用
             return self.config_data
         elif self.config_path:
-            # 如果传入了配置文件路径，则从文件加载
             with open(self.config_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         else:
-            raise ValueError('Either config_path or config_data must be provided')
+            raise ValueError(
+                'Either config_path or config_data must be provided')
 
     def init_plugins(self):
         """
-        加载配置文件,并按优先级排序,返回一个字典,key为插件名,value为插件实例
+        加载配置文件,按阶段组织插件实例
+        :return: 按阶段组织的插件字典 {stage: [(priority, plugin_instance), ...]}
         """
-        plugin_configs = self.load_config()
-        # 按优先级排序
-        plugin_configs.sort(key=lambda x: x['priority'], reverse=True)
-        # 挑选enabled为true的插件
-        plugin_configs = [x for x in plugin_configs if x['enabled']]
-        # 初始化所有插件
+        config = self.load_config()
         plugins_map = {}
-        for config in plugin_configs:
-            # print(f"[Initializing plugin]: {config['name']}")
-            plugins_map[config['name']] = eval(config['name'])(plugin_config=config, all_config=self.all_config)
+
+        for stage, plugin_configs in config.items():
+            stage_plugins = []
+            # 按优先级排序
+            plugin_configs.sort(key=lambda x: x['priority'], reverse=True)
+            # 只处理enabled的插件
+            enabled_configs = [x for x in plugin_configs if x['enabled']]
+
+            for plugin_config in enabled_configs:
+                plugin_name = plugin_config['name']
+                plugin_instance = eval(plugin_name)(
+                    plugin_config=plugin_config, all_config=self.all_config)
+                stage_plugins.append(
+                    (plugin_config['priority'], plugin_instance))
+
+            plugins_map[stage] = stage_plugins
+
+        print(plugins_map)
+
         return plugins_map
 
     def execute_all_plugins(self, data):
         """
-        执行所有插件
-        TODO: data 是传入的对象,结构未定,后续最好抽象成固定结构的对象。
+        按顺序执行所有阶段的插件
         """
-        for plugin_name, plugin in self.plugins_map.items():
-            # print(f"[Executing] plugin: {plugin_name}")
-            data = plugin.execute(data)
+        for stage in self.plugins_map.keys():
+            for priority, plugin in self.plugins_map[stage]:
+                print(f"执行阶段: {stage}, 插件: {plugin.name}, 优先级: {priority}")
+                data = plugin.execute(data)
         return data
