@@ -1,16 +1,18 @@
-from ..plugin_base import PluginBase
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from plugin_base import PluginBase
+from typing import Any
 
 
 class Plugin3(PluginBase):
     def init(self):
         """插件初始化"""
-        self.init_tag = True
-        pass
+        print(f"Plugin3 初始化完成")
 
-    def execute(self, data):
+    def execute(self, data: Any) -> Any:
         """插件执行体"""
-        if not self.init_tag:
-            self.init()
-        print('[Plugin]: {} execute!'.format(self.plugin_name))
-        # 执行 data 处理
+        print(f'[{self.plugin_name}] 处理数据: {data}')
+        if isinstance(data, dict):
+            data['processed_by'] = data.get('processed_by', []) + ['Plugin3']
         return data

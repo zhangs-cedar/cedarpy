@@ -1,14 +1,21 @@
 from plugins.plugin_manager import PluginManager
 
 
-# 使用示例
 if __name__ == '__main__':
-    # 通过配置文件初始化
-    config_path = 'config.json'
-    plugin_manager = PluginManager(config_path=config_path)
-    data = {'title': 'test', 'content': 'test content'}
+    # 初始化插件管理器
+    manager = PluginManager(config_path='config.json')
+    
+    # 列出可用插件
+    print("=== 可用插件 ===")
+    plugins_info = manager.list_plugins()
+    for stage, plugins in plugins_info.items():
+        print(f"{stage}: {plugins}")
+    
+    # 测试数据
+    data = {'title': 'test', 'content': 'test content', 'processed_by': []}
+    print(f"\n=== 初始数据 ===\n{data}")
     
     # 执行所有阶段
-    print("=== 执行所有阶段 ===")
-    result = plugin_manager.execute_all_plugins(data)
-    print(f"最终结果: {result}")
+    print(f"\n=== 执行所有阶段 ===")
+    result = manager.execute_all(data)
+    print(f"\n=== 最终结果 ===\n{result}")

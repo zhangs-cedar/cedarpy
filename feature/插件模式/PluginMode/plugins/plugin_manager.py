@@ -1,83 +1,134 @@
 import json
-from .plugin_all import *
-
-
-def get_nested_value(d: dict, *keys: str, default=None):
-    """安全地从嵌套字典中获取值。
-    """
-    for key in keys:
-        if isinstance(d, dict) and key in d:
-            d = d[key]
-        else:
-            return default
-    return d
+import os
+import importlib.util
+import inspect
+from pathlib import Path
+from typing import Dict, List, Tuple, Any, Optional
+from .plugin_base import PluginBase
 
 
 class PluginManager:
-    """
-    插件管理器
-    """
+    """插件管理器 - 安全、高效、可扩展"""
 
-    def __init__(self, config_path=None, config_data=None, all_config=None):
+    def __init__(self, config_path: Optional[str] = None, 
+                 config_data: Optional[Dict] = None,
+                 plugin_dirs: Optional[List[str]] = None):
         """
         初始化插件管理器
-        :param config_path: 配置文件路径（可选）
-        :param config_data: 已解析好的配置数据（可选）
-        :param all_config: 全局配置（可选）
+        :param config_path: 配置文件路径
+        :param config_data: 配置数据
+        :param plugin_dirs: 插件目录列表
         """
         self.config_path = config_path
         self.config_data = config_data
-        self.all_config = all_config
-        self.plugins_map = self.init_plugins()
+        self.plugin_dirs = plugin_dirs or [os.path.join(os.path.dirname(__file__), 'test')]
+        self.registered_plugins = {}  # {plugin_name: plugin_class}
+        self.stage_plugins = {}  # {stage: [(priority, plugin_instance)]}
+        
+        self._discover_plugins()
+        self._init_plugins()
 
-    def load_config(self):
-        """
-        加载配置文件或直接使用已解析好的配置数据
-        :return: 配置数据
-        """
+    def _discover_plugins(self):
+        """动态发现插件类"""
+        import sys
+        
+        for plugin_dir in self.plugin_dirs:
+            if not os.path.exists(plugin_dir):
+                continue
+                
+            # 将插件目录添加到sys.path
+            if plugin_dir not in sys.path:
+                sys.path.insert(0, plugin_dir)
+                
+            for file_path in Path(plugin_dir).glob('*.py'):
+                if file_path.name.startswith('__') or file_path.stem == 'plugin_base':
+                    continue
+                    
+                try:
+                    module_name = file_path.stem
+                    spec = importlib.util.spec_from_file_location(module_name, file_path)
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[module_name] = module
+                    spec.loader.exec_module(module)
+                    
+                    # 查找插件类
+                    for name, obj in inspect.getmembers(module, inspect.isclass):
+                        # 检查是否为插件类：类名以Plugin开头，且有execute方法，排除PluginBase
+                        if (name.startswith('Plugin') and 
+                            name != 'PluginBase' and
+                            hasattr(obj, 'execute') and 
+                            hasattr(obj, 'init') and
+                            callable(getattr(obj, 'execute')) and
+                            callable(getattr(obj, 'init'))):
+                            self.registered_plugins[name] = obj
+                            
+                except Exception as e:
+                    print(f"警告: 加载插件 {file_path} 失败: {e}")
+
+    def _load_config(self) -> Dict:
+        """加载配置"""
         if self.config_data:
             return self.config_data
-        elif self.config_path:
-            with open(self.config_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        else:
-            raise ValueError(
-                'Either config_path or config_data must be provided')
+        elif self.config_path and os.path.exists(self.config_path):
+            try:
+                with open(self.config_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"配置加载失败: {e}")
+                return {}
+        return {}
 
-    def init_plugins(self):
-        """
-        加载配置文件,按阶段组织插件实例
-        :return: 按阶段组织的插件字典 {stage: [(priority, plugin_instance), ...]}
-        """
-        config = self.load_config()
-        plugins_map = {}
-
+    def _init_plugins(self):
+        """初始化插件实例"""
+        config = self._load_config()
+        
         for stage, plugin_configs in config.items():
             stage_plugins = []
-            # 按优先级排序
-            plugin_configs.sort(key=lambda x: get_nested_value(x, 'priority', default=0), reverse=True)
-            # 只处理enabled的插件
-            enabled_configs = [x for x in plugin_configs if get_nested_value(x, 'enabled', default=False)]
-
-            for plugin_config in enabled_configs:
-                plugin_name = get_nested_value(plugin_config, 'plugin_name', default='noplugin_name')
-                if not plugin_name:
+            
+            for plugin_config in plugin_configs:
+                if not plugin_config.get('enabled', True):
                     continue
-                # 导入插件
-                plugin_instance = eval(plugin_name)(
-                    plugin_config=plugin_config, all_config=self.all_config)
-                priority = get_nested_value(plugin_config, 'priority', default=0)
-                stage_plugins.append((priority, plugin_instance))
-            plugins_map[stage] = stage_plugins
+                    
+                plugin_name = plugin_config.get('plugin_name')
+                if not plugin_name or plugin_name not in self.registered_plugins:
+                    print(f"警告: 插件 {plugin_name} 未找到")
+                    continue
+                
+                try:
+                    plugin_class = self.registered_plugins[plugin_name]
+                    plugin_instance = plugin_class(plugin_config)
+                    priority = plugin_config.get('priority', 0)
+                    stage_plugins.append((priority, plugin_instance))
+                except Exception as e:
+                    print(f"警告: 插件 {plugin_name} 初始化失败: {e}")
+            
+            # 按优先级排序
+            stage_plugins.sort(key=lambda x: x[0], reverse=True)
+            self.stage_plugins[stage] = stage_plugins
 
-        return plugins_map
-
-    def execute_all_plugins(self, data):
-        """
-        按顺序执行所有阶段的插件
-        """
-        for stage in self.plugins_map.keys():
-            for priority, plugin in self.plugins_map[stage]:
-                print(f"执行阶段: {stage}, 插件: {plugin.plugin_name}, 优先级: {priority}")
+    def execute_stage(self, stage: str, data: Any) -> Any:
+        """执行指定阶段的插件"""
+        if stage not in self.stage_plugins:
+            return data
+            
+        for priority, plugin in self.stage_plugins[stage]:
+            try:
+                print(f"执行: {stage}.{plugin.plugin_name} (优先级:{priority})")
                 data = plugin.execute(data)
+            except Exception as e:
+                print(f"错误: 插件 {plugin.plugin_name} 执行失败: {e}")
+                # 继续执行其他插件，不中断流程
         return data
+
+    def execute_all(self, data: Any) -> Any:
+        """执行所有阶段插件"""
+        for stage in self.stage_plugins:
+            data = self.execute_stage(stage, data)
+        return data
+
+    def list_plugins(self) -> Dict[str, List[str]]:
+        """列出所有可用插件"""
+        result = {'registered': list(self.registered_plugins.keys())}
+        for stage, plugins in self.stage_plugins.items():
+            result[stage] = [p[1].plugin_name for p in plugins]
+        return result
