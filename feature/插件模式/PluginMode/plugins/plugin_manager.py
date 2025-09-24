@@ -21,7 +21,10 @@ class PluginManager:
         """
         self.config_path = config_path
         self.config_data = config_data
-        self.plugin_dirs = plugin_dirs or [os.path.join(os.path.dirname(__file__), 'test')]
+        self.plugin_dirs = plugin_dirs or [
+            os.path.join(os.path.dirname(__file__), 'test'),
+            os.path.join(os.path.dirname(__file__), 'test2')
+        ]
         self.registered_plugins = {}  # {plugin_name: plugin_class}
         self.stage_plugins = {}  # {stage: [(priority, plugin_instance)]}
         

@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 
 class PluginBase(ABC):
-    """插件基类 - 简洁高效"""
+    """插件基类"""
 
     def __init__(self, plugin_config: Dict[str, Any]):
         """
@@ -13,8 +13,6 @@ class PluginBase(ABC):
         self.plugin_name = plugin_config.get('plugin_name', self.__class__.__name__)
         self.config = plugin_config.get('config', {})
         self._initialized = False
-        
-        # 构造时就初始化，别搞什么懒加载
         self._init()
 
     def _init(self):

@@ -33,6 +33,14 @@
             "config": {
                 "param3": "value3"
             }
+        },
+        {
+            "plugin_name": "Plugin4",
+            "enabled": true,
+            "priority": 80,
+            "config": {
+                "param4": "value4"
+            }
         }
     ]
 }
