@@ -7,6 +7,10 @@ from sklearn.metrics import mean_squared_error, r2_score
 from functools import partial
 import cv2
 
+# 设置中文字体
+plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans']
+plt.rcParams['axes.unicode_minus'] = False
+
 def create_defect_image(size=(50, 50), defect_type='crack', severity=0.5):
     """创建人工缺陷图像
     
@@ -176,37 +180,37 @@ def visualize_results(rf, X_test, y_test, y_pred):
     # 1. 预测vs真实值
     axes[0, 0].scatter(y_test, y_pred, alpha=0.6)
     axes[0, 0].plot([0, 1], [0, 1], 'r--', lw=2)
-    axes[0, 0].set_xlabel('真实严重度')
-    axes[0, 0].set_ylabel('预测严重度')
-    axes[0, 0].set_title('预测 vs 真实值')
+    axes[0, 0].set_xlabel('True Severity')
+    axes[0, 0].set_ylabel('Predicted Severity')
+    axes[0, 0].set_title('Predicted vs True')
     axes[0, 0].grid(True)
     
     # 2. 残差图
     residuals = y_test - y_pred
     axes[0, 1].scatter(y_pred, residuals, alpha=0.6)
     axes[0, 1].axhline(y=0, color='r', linestyle='--')
-    axes[0, 1].set_xlabel('预测值')
-    axes[0, 1].set_ylabel('残差')
-    axes[0, 1].set_title('残差图')
+    axes[0, 1].set_xlabel('Predicted')
+    axes[0, 1].set_ylabel('Residuals')
+    axes[0, 1].set_title('Residual Plot')
     axes[0, 1].grid(True)
     
     # 3. 特征重要性
-    feature_names = [f'特征_{i}' for i in range(len(rf.feature_importances_))]
+    feature_names = [f'Feature_{i}' for i in range(len(rf.feature_importances_))]
     importance = rf.feature_importances_
     sorted_idx = np.argsort(importance)[::-1][:10]  # 前10个重要特征
     
     axes[1, 0].barh(range(len(sorted_idx)), importance[sorted_idx])
     axes[1, 0].set_yticks(range(len(sorted_idx)))
     axes[1, 0].set_yticklabels([feature_names[i] for i in sorted_idx])
-    axes[1, 0].set_xlabel('重要性')
-    axes[1, 0].set_title('特征重要性 (Top 10)')
+    axes[1, 0].set_xlabel('Importance')
+    axes[1, 0].set_title('Feature Importance (Top 10)')
     
     # 4. 预测分布
-    axes[1, 1].hist(y_test, alpha=0.7, label='真实值', bins=20)
-    axes[1, 1].hist(y_pred, alpha=0.7, label='预测值', bins=20)
-    axes[1, 1].set_xlabel('严重度')
-    axes[1, 1].set_ylabel('频次')
-    axes[1, 1].set_title('严重度分布')
+    axes[1, 1].hist(y_test, alpha=0.7, label='True', bins=20)
+    axes[1, 1].hist(y_pred, alpha=0.7, label='Predicted', bins=20)
+    axes[1, 1].set_xlabel('Severity')
+    axes[1, 1].set_ylabel('Frequency')
+    axes[1, 1].set_title('Severity Distribution')
     axes[1, 1].legend()
     
     plt.tight_layout()
@@ -230,11 +234,11 @@ def test_on_new_images(rf):
         
         # 显示结果
         axes[0, i].imshow(img, cmap='gray')
-        axes[0, i].set_title(f'{defect_type}\n真实: {true_severity:.3f}')
+        axes[0, i].set_title(f'{defect_type}\nTrue: {true_severity:.3f}')
         axes[0, i].axis('off')
         
         axes[1, i].imshow(img, cmap='gray')
-        axes[1, i].set_title(f'预测: {pred_severity:.3f}')
+        axes[1, i].set_title(f'Pred: {pred_severity:.3f}')
         axes[1, i].axis('off')
     
     plt.tight_layout()
