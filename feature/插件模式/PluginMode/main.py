@@ -1,4 +1,4 @@
-from plugins.plugin_manager import PluginManager
+from plugins import PluginManager
 
 
 if __name__ == '__main__':

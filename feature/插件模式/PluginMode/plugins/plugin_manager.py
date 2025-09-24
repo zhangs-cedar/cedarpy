@@ -4,11 +4,11 @@ import importlib.util
 import inspect
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, Optional
-from .plugin_base import PluginBase
+from plugins.plugin_base import PluginBase
 
 
 class PluginManager:
-    """插件管理器 - 安全、高效、可扩展"""
+    """插件管理器"""
 
     def __init__(self, config_path: Optional[str] = None, 
                  config_data: Optional[Dict] = None,
@@ -30,40 +30,35 @@ class PluginManager:
 
     def _discover_plugins(self):
         """动态发现插件类"""
-        import sys
-        
         for plugin_dir in self.plugin_dirs:
             if not os.path.exists(plugin_dir):
                 continue
                 
-            # 将插件目录添加到sys.path
-            if plugin_dir not in sys.path:
-                sys.path.insert(0, plugin_dir)
-                
             for file_path in Path(plugin_dir).glob('*.py'):
-                if file_path.name.startswith('__') or file_path.stem == 'plugin_base':
+                if file_path.name.startswith('__'):
                     continue
                     
                 try:
-                    module_name = file_path.stem
+                    # 构建模块名：test.plugin1 这样的形式
+                    module_name = f"{Path(plugin_dir).name}.{file_path.stem}"
                     spec = importlib.util.spec_from_file_location(module_name, file_path)
                     module = importlib.util.module_from_spec(spec)
-                    sys.modules[module_name] = module
                     spec.loader.exec_module(module)
                     
-                    # 查找插件类
+                    # 查找插件类 - 简化检测逻辑
                     for name, obj in inspect.getmembers(module, inspect.isclass):
-                        # 检查是否为插件类：类名以Plugin开头，且有execute方法，排除PluginBase
-                        if (name.startswith('Plugin') and 
-                            name != 'PluginBase' and
-                            hasattr(obj, 'execute') and 
-                            hasattr(obj, 'init') and
-                            callable(getattr(obj, 'execute')) and
-                            callable(getattr(obj, 'init'))):
+                        if self._is_plugin_class(obj):
                             self.registered_plugins[name] = obj
                             
                 except Exception as e:
                     print(f"警告: 加载插件 {file_path} 失败: {e}")
+    
+    def _is_plugin_class(self, cls) -> bool:
+        """检查是否为有效插件类"""
+        return (issubclass(cls, PluginBase) and 
+                cls != PluginBase and
+                hasattr(cls, 'execute') and 
+                hasattr(cls, 'init'))
 
     def _load_config(self) -> Dict:
         """加载配置"""

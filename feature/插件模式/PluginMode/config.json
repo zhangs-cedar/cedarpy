@@ -19,6 +19,14 @@
     ],
     "postprocess": [
         {
+            "plugin_name": "Plugin2",
+            "enabled": true,
+            "priority": 90,
+            "config": {
+                "param2": "value2"
+            }
+        },
+        {
             "plugin_name": "Plugin3",
             "enabled": true,
             "priority": 100,
