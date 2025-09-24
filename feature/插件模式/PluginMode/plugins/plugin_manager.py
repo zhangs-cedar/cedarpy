@@ -1,5 +1,5 @@
 import json
-from .plugin_all_cls import *
+from .plugin_all import *
 
 
 def get_nested_value(d: dict, *keys: str, default=None):
@@ -63,6 +63,7 @@ class PluginManager:
                 plugin_name = get_nested_value(plugin_config, 'plugin_name', default='noplugin_name')
                 if not plugin_name:
                     continue
+                # 导入插件
                 plugin_instance = eval(plugin_name)(
                     plugin_config=plugin_config, all_config=self.all_config)
                 priority = get_nested_value(plugin_config, 'priority', default=0)
