@@ -31,6 +31,7 @@ def init_cfg(config_file_path, file=None):
     with open(config_file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
+
 def create_name(format_type='standard'):
     """创建时间戳名字"""
     now = datetime.now()
@@ -39,7 +40,7 @@ def create_name(format_type='standard'):
         'standard': '%Y-%m-%d_%H-%M-%S',
         'date_only': '%Y-%m-%d',
         'time_only': '%H-%M-%S',
-        'compact': '%Y%m%d%H%M%S%f'
+        'compact': '%Y%m%d%H%M%S%f',
     }
     if format_type not in formats:
         raise ValueError(f'不支持的格式: {format_type}')
@@ -63,6 +64,7 @@ def rmtree_makedirs(*dirs):
 
 def timeit(func):
     """计时装饰器"""
+
     @wraps(func)
     def decorated(*args, **kwargs):
         start = time.time()
@@ -92,8 +94,7 @@ def try_except(func):
 def run_subprocess(cmd, cwd=None):
     """执行子进程"""
     cwd = cwd or os.path.dirname(os.path.abspath(__file__))
-    process = subprocess.Popen(cmd, cwd=cwd, shell=False, 
-                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    process = subprocess.Popen(cmd, cwd=cwd, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return process, stdout, stderr
 
@@ -155,17 +156,19 @@ def get_files_list(input_path, find_suffix=None, sortby='name'):
         name, suffix = split_filename(names)
         if find_suffix and suffix not in find_suffix:
             continue
-        
-        files_list.append({
-            'name': name,
-            'suffix': suffix,
-            'names': names,
-            'path': file_path,
-            'root': osp.dirname(file_path),
-            'modification_time': datetime.fromtimestamp(osp.getmtime(file_path)),
-            'creation_time': datetime.fromtimestamp(osp.getctime(file_path))
-        })
-    
+
+        files_list.append(
+            {
+                'name': name,
+                'suffix': suffix,
+                'names': names,
+                'path': file_path,
+                'root': osp.dirname(file_path),
+                'modification_time': datetime.fromtimestamp(osp.getmtime(file_path)),
+                'creation_time': datetime.fromtimestamp(osp.getctime(file_path)),
+            }
+        )
+
     return natsort.natsorted(files_list, key=lambda x: x[sortby])
 
 

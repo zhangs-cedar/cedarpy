@@ -13,24 +13,23 @@ def init_logger(name=__name__, log_file=None, log_level=logging.INFO):
     global _logger
     if _logger:
         return
-    
+
     _logger = logging.getLogger(name)
-    formatter = logging.Formatter('[%(asctime)s] %(name)s %(levelname)s: %(message)s', 
-                                datefmt='%Y/%m/%d %H:%M:%S')
-    
+    formatter = logging.Formatter('[%(asctime)s] %(name)s %(levelname)s: %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
+
     # 控制台输出
     console = logging.StreamHandler(sys.stdout)
     console.setFormatter(formatter)
     _logger.addHandler(console)
-    
+
     # 文件输出
     log_file = log_file or f'./{create_name()}.log'
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    
+
     file_handler = logging.FileHandler(log_file, encoding='utf8')
     file_handler.setFormatter(formatter)
     _logger.addHandler(file_handler)
-    
+
     _logger.setLevel(log_level)
     _logger.warning('日志器初始化完成')
 

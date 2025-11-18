@@ -1,6 +1,6 @@
 import setuptools
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 
 setuptools.setup(
     name='cedar',  # 模块名称
@@ -20,5 +20,5 @@ setuptools.setup(
     install_requires=[
         # "numpy",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.8',
 )

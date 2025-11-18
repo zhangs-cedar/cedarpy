@@ -5,7 +5,7 @@ from typing import Any
 class Plugin1(PluginBase):
     def init(self):
         """插件初始化"""
-        print(f"Plugin1 初始化完成")
+        print(f'Plugin1 初始化完成')
 
     def execute(self, data: Any) -> Any:
         """插件执行体"""
@@ -14,5 +14,3 @@ class Plugin1(PluginBase):
         if isinstance(data, dict):
             data['processed_by'] = data.get('processed_by', []) + ['Plugin1']
         return data
-
-

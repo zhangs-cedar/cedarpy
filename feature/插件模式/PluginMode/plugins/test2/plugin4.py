@@ -5,7 +5,7 @@ from typing import Any
 class Plugin4(PluginBase):
     def init(self):
         """插件初始化"""
-        print(f"Plugin4 初始化完成")
+        print(f'Plugin4 初始化完成')
 
     def execute(self, data: Any) -> Any:
         """插件执行体"""

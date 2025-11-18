@@ -36,4 +36,4 @@ class PluginBase(ABC):
         return self.config.get(key, default)
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__}({self.plugin_name})"
+        return f'{self.__class__.__name__}({self.plugin_name})'

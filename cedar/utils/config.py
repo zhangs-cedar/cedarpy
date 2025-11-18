@@ -8,7 +8,7 @@ from cedar.utils.dict2obj import Dict2Obj
 
 class Config:
     """配置管理类"""
-    
+
     def __init__(self, config_path):
         self.config_data = self.load(config_path)
         self.obj = Dict2Obj(self.config_data)
@@ -17,7 +17,7 @@ class Config:
     def load(self, path):
         """加载配置文件"""
         ext = os.path.splitext(path)[1].lower()
-        
+
         with open(path, 'r', encoding='utf-8') as f:
             if ext in ('.yaml', '.yml'):
                 return yaml.safe_load(f)

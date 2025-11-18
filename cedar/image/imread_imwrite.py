@@ -16,9 +16,9 @@ def imwrite(image_path, img, plt=False):
     """保存图片，支持中文路径"""
     if img is None:
         raise ValueError('图片不能为空')
-    
+
     if plt:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    
+
     suffix = split_filename(image_path)[1]
     cv2.imencode(suffix, img)[1].tofile(image_path)
