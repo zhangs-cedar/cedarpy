@@ -109,6 +109,8 @@ def print(*args: Any, sep: str = ' ', end: str = '\n', file: Optional[str] = Non
     if file is None:
         file = log_file_path
 
+    os.makedirs(os.path.dirname(file), exist_ok=True)
+
     # 写入日志文件（不带颜色）
     with open(file, 'a', encoding='utf-8') as log_file:
         log_file.write(log_output + '\n')

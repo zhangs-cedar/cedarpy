@@ -1,81 +1,68 @@
+import hashlib
+import json
 import os
 import os.path as osp
-import natsort
 import shutil
-import hashlib
+import subprocess
+import sys
 import time
 import traceback
-import subprocess
-from functools import wraps
+import natsort
 from datetime import datetime
-from typing import Optional, List, Tuple, Union, Any, Dict
+from functools import wraps
+from typing import Any
+
 from cedar.utils.s_print import print
 
 
+def init_cfg(config_file_path, file=None):
+    """初始化配置"""
+    file = file or __file__
+    config_file_path = config_file_path or os.environ.get('SCRIPT_CONFIG_FILE') or (sys.argv[1] if len(sys.argv) > 1 else None)
+    if not config_file_path:
+        raise ValueError('未提供配置文件路径')
+
+    base_dir = os.environ.get('CEDAR_BASE_DIR', './')
+    script_name = osp.basename(osp.dirname(file))
+    log_dir = osp.join(base_dir, 'log', script_name)
+    os.makedirs(log_dir, exist_ok=True)
+    os.environ['LOG_PATH'] = osp.join(log_dir, create_name() + '.log')
+
+    with open(config_file_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
 def create_name(format_type='standard'):
-    """创建基于当前时间的名字
-
-    Args:
-        format_type (str): 时间格式类型，可选值：
-            - 'full': 包含毫秒的完整格式 (默认)
-            - 'standard': 标准格式，不包含毫秒
-            - 'date_only': 仅包含日期
-            - 'time_only': 仅包含时间
-            - 'compact': 紧凑格式，无分隔符
-    """
+    """创建时间戳名字"""
     now = datetime.now()
-
-    if format_type == 'full':
-        return now.strftime('%Y-%m-%d_%H-%M-%S-%f')
-    elif format_type == 'standard':
-        return now.strftime('%Y-%m-%d_%H-%M-%S')
-    elif format_type == 'date_only':
-        return now.strftime('%Y-%m-%d')
-    elif format_type == 'time_only':
-        return now.strftime('%H-%M-%S')
-    elif format_type == 'compact':
-        return now.strftime('%Y%m%d%H%M%S%f')
-    else:
-        raise ValueError(
-            f'Unsupported format_type: {format_type}. ' f"Supported types: 'full', 'standard', 'date_only', 'time_only', 'compact'"
-        )
+    formats = {
+        'full': '%Y-%m-%d_%H-%M-%S-%f',
+        'standard': '%Y-%m-%d_%H-%M-%S',
+        'date_only': '%Y-%m-%d',
+        'time_only': '%H-%M-%S',
+        'compact': '%Y%m%d%H%M%S%f'
+    }
+    if format_type not in formats:
+        raise ValueError(f'不支持的格式: {format_type}')
+    return now.strftime(formats[format_type])
 
 
 def split_filename(filename: str) -> tuple:
-    """分解名字为 name 和 suffix
-
-    Examples:
-        >>> split_filename("test.txt")
-        ('test', '.txt')
-        >>> split_filename("test.jpg")
-        ('test', '.jpg')
-
-    Returns:
-        name, suffix
-    """
-    name = filename.rsplit('.', 1)[0]
-    suffix = '.' + filename.rsplit('.', 1)[1]
-
-    return name, suffix
+    """分解文件名"""
+    parts = filename.rsplit('.', 1)
+    return parts[0], '.' + parts[1] if len(parts) > 1 else ''
 
 
-def rmtree_makedirs(*args):
-    """rmtree_makedirs
-    Args:
-        dir (str): 文件夹路径
-    Example:
-        >>> rmtree_makedirs("/tmp/test/a", "/tmp/test/b")
-    """
-    for index, dir in enumerate(args):
-        if osp.exists(dir):
-            shutil.rmtree(dir)
-        os.makedirs(dir)
-        print('[Method {}], Create dir {}'.format(rmtree_makedirs.__name__, dir))
+def rmtree_makedirs(*dirs):
+    """删除并重建目录"""
+    for dir_path in dirs:
+        if osp.exists(dir_path):
+            shutil.rmtree(dir_path)
+        os.makedirs(dir_path)
+        print(f'[{rmtree_makedirs.__name__}] 创建目录 {dir_path}')
 
 
 def timeit(func):
-    """时间修饰器，通过环境变量 timeit_debug 控制是否打印时间信息"""
-
+    """计时装饰器"""
     @wraps(func)
     def decorated(*args, **kwargs):
         start = time.time()
@@ -103,188 +90,87 @@ def try_except(func):
 
 
 def run_subprocess(cmd, cwd=None):
-    if not cwd:
-        # 获取当前脚本文件的路径
-        script_path = os.path.abspath(__file__)
-        # 获取当前脚本文件所在的目录
-        cwd = os.path.dirname(script_path)
-
-    # 为了安全起见，避免使用shell=True，除非绝对必要。
-    # 如果确实需要使用shell特性，确保cmd的内容是安全的。
-    process = subprocess.Popen(cmd, cwd=cwd, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-
-    # 读取输出和错误，避免潜在的死锁
+    """执行子进程"""
+    cwd = cwd or os.path.dirname(os.path.abspath(__file__))
+    process = subprocess.Popen(cmd, cwd=cwd, shell=False, 
+                             stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return process, stdout, stderr
 
 
 def get_file_md5(filename):
-    """
-    计算指定文件的MD5哈希值。
-
-    参数:
-    - filename: 文件的路径。
-
-    返回:
-    - 文件的MD5哈希值，以十六进制字符串形式。
-    """
+    """计算文件MD5"""
     hash_md5 = hashlib.md5()
-    with open(filename, 'rb') as f:  # 以二进制形式读取文件
-        for chunk in iter(lambda: f.read(4096), b''):  # 按块读取文件
-            hash_md5.update(chunk)  # 更新MD5哈希值
-    return hash_md5.hexdigest()  # 返回十六进制形式的哈希值
+    with open(filename, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b''):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def find_duplicate_filenames(directory):
-    """
-    在指定目录下搜索重复的文件名，并返回这些文件名列表。
-
-    Args:
-        directory (str): 需要搜索的目录路径。
-
-    Returns:
-        list: 包含重复文件名的列表，列表中的元素是字符串类型。
-
-    """
+    """查找重复文件名"""
     filename_counts = {}
     for root, dirs, files in os.walk(directory):
         for filename in files:
-            if filename in filename_counts:
-                filename_counts[filename] += 1
-            else:
-                filename_counts[filename] = 1
-    duplicates = [f for f, count in filename_counts.items() if count > 1]
-    return duplicates
+            filename_counts[filename] = filename_counts.get(filename, 0) + 1
+    return [f for f, count in filename_counts.items() if count > 1]
 
 
 def move_file(src_path, dst_dir, filename=None):
-    """
-    将文件从源路径移动到目标目录，并可选择性地重命名文件。
-
-    Args:
-        src_path (str): 源文件的路径。
-        dst_dir (str): 目标目录的路径。
-        filename (str, optional): 可选的文件名，如果提供，则将源文件重命名为该名称。
-            默认为None，表示使用源文件的原始文件名。
-
-    Returns:
-        None
-
-    Raises:
-        FileNotFoundError: 如果源文件不存在，则引发此异常。
-        PermissionError: 如果用户没有足够的权限来移动文件或创建目录，则可能引发此异常。
-        其他可能的异常: 调用os和shutil模块时可能引发的其他异常。
-
-    """
-    # 如果没有提供文件名，则使用源文件的文件名
-    if filename is None:
-        filename = os.path.basename(src_path)
-    # 确保目标目录存在
+    """移动文件"""
+    filename = filename or os.path.basename(src_path)
     os.makedirs(dst_dir, exist_ok=True)
-    # 目标文件的完整路径
     dst_path = os.path.join(dst_dir, filename)
-    # 如果目标目录中存在同名文件，则删除它
     if os.path.exists(dst_path):
         os.remove(dst_path)
-    # 移动文件
     shutil.move(src_path, dst_path)
 
 
 def copy_file(src_path, dst_dir, filename=None):
-    """
-    将文件从源路径移动到目标目录，并可选择性地重命名文件。
-
-    Args:
-        src_path (str): 源文件的路径。
-        dst_dir (str): 目标目录的路径。
-        filename (str, optional): 可选的文件名，如果提供，则将源文件重命名为该名称。
-            默认为None，表示使用源文件的原始文件名。
-
-    Returns:
-        None
-
-    Raises:
-        FileNotFoundError: 如果源文件不存在，则引发此异常。
-        PermissionError: 如果用户没有足够的权限来移动文件或创建目录，则可能引发此异常。
-        其他可能的异常: 调用os和shutil模块时可能引发的其他异常。
-
-    """
-    # 如果没有提供文件名，则使用源文件的文件名
-    if filename is None:
-        filename = os.path.basename(src_path)
-    # 确保目标目录存在
+    """复制文件"""
+    filename = filename or os.path.basename(src_path)
     os.makedirs(dst_dir, exist_ok=True)
-    # 目标文件的完整路径
     dst_path = os.path.join(dst_dir, filename)
-    # 如果目标目录中存在同名文件，则删除它
     if os.path.exists(dst_path):
         os.remove(dst_path)
-    # 移动文件
     shutil.copy(src_path, dst_path)
 
 
-def get_files_list(input_path, find_suffix=[], sortby='name'):
-    """获取文件列表
-    Args:
-        input_path: 输入目录 | 文件路径
-        return: 文件路径列表
-    """
+def get_files_list(input_path, find_suffix=None, sortby='name'):
+    """获取文件列表"""
+    find_suffix = find_suffix or []
     filepath_list = []
 
-    if os.path.isfile(input_path):  # 如果是文件
+    if os.path.isfile(input_path):
         filepath_list.append(input_path)
-    elif os.path.isdir(input_path):  # 如果是目录
+    elif os.path.isdir(input_path):
         for root, dirs, files in os.walk(input_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                filepath_list.append(file_path)
+            filepath_list.extend(os.path.join(root, f) for f in files)
     else:
-        raise ValueError('Input path must be a file or directory.')
-    # 按照文件名排序
+        raise ValueError('路径必须是文件或目录')
+
     files_list = []
     for file_path in filepath_list:
         names = osp.basename(file_path)
-        root = osp.dirname(file_path)
         name, suffix = split_filename(names)
-        if len(find_suffix) != 0 and suffix not in find_suffix:  # 如果find_suffix为空，则不跳过，else找不到指定的后缀，则跳过,
+        if find_suffix and suffix not in find_suffix:
             continue
-        modification_time = osp.getmtime(file_path)  # 获取文件的修改时间
-        # 获取文件的创建时间
-        creation_time = osp.getctime(file_path)
-        file = {}
-        file['name'] = name
-        file['suffix'] = suffix
-        file['names'] = names
-        file['path'] = file_path
-        file['root'] = root
-        file['modification_time'] = datetime.fromtimestamp(modification_time)
-        file['creation_time'] = datetime.fromtimestamp(creation_time)
-        files_list.append(file)
-    files_list = natsort.natsorted(files_list, key=lambda x: x[sortby])
-    return files_list
+        
+        files_list.append({
+            'name': name,
+            'suffix': suffix,
+            'names': names,
+            'path': file_path,
+            'root': osp.dirname(file_path),
+            'modification_time': datetime.fromtimestamp(osp.getmtime(file_path)),
+            'creation_time': datetime.fromtimestamp(osp.getctime(file_path))
+        })
+    
+    return natsort.natsorted(files_list, key=lambda x: x[sortby])
 
 
 def get_nested_value(d: dict, *keys: str, default: Any = None) -> Any:
-    """安全地从嵌套字典中获取值。
-
-    递归地遍历嵌套字典，按照给定的键序列获取值。如果任何一个键不存在，
-    则返回默认值。
-
-    Args:
-        d: 要查询的字典
-        *keys: 键的序列，按照从外到内的顺序
-        default: 当键不存在时返回的默认值，默认为None
-
-    Returns:
-        Any: 找到的值或默认值
-
-    Examples:
-        >>> d = {'a': {'b': {'c': 1}}}
-        >>> get_nested_value(d, 'a', 'b', 'c')
-        1
-        >>> get_nested_value(d, 'a', 'b', 'd', default=0)
-        0
-    """
+    """从嵌套字典获取值"""
     for key in keys:
         if isinstance(d, dict) and key in d:
             d = d[key]
