@@ -2,4 +2,6 @@
 #---[ ignore list ]---
 **/**.pyc
 *.log
-
+env/*
+*.pkl
+*.whl
