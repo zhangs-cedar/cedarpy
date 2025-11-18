@@ -1,89 +1,57 @@
+import logging
 import os
 import sys
-import logging
-from typing import Optional, Any
+from typing import Any
+
 from cedar.utils.tools import create_name
 
-_logger: Optional[logging.Logger] = None
+_logger = None
 
 
-def init_logger(name: str = __name__, log_file: Optional[str] = None, log_level: int = logging.INFO) -> None:
-    """初始化并获取日志记录器
-
-    如果尚未初始化日志记录器，则通过此方法初始化日志记录器，添加一个或两个处理程序；
-    否则将直接返回已初始化的日志记录器。在初始化过程中，将始终添加一个 StreamHandler。
-    如果指定了 log_file，则还将添加一个 FileHandler。
-
-    Args:
-        name: 日志记录器名称（"root" 或其他）
-        log_file: 日志文件名，如果指定则将向日志记录器添加一个 FileHandler
-        log_level: 日志记录器级别，仅影响进程0的过程，其他进程将级别设置为"Error"
-
-    Raises:
-        AssertionError: 当日志记录器被重复初始化时
-    """
+def init_logger(name=__name__, log_file=None, log_level=logging.INFO):
+    """初始化日志器"""
     global _logger
-    assert _logger is None, 'logger should not be initialized twice or more.'
+    if _logger:
+        return
+    
     _logger = logging.getLogger(name)
-
-    formatter = logging.Formatter('[%(asctime)s] %(name)s %(levelname)s: %(message)s', datefmt='%Y/%m/%d %H:%M:%S')
-
-    stream_handler = logging.StreamHandler(stream=sys.stdout)
-    stream_handler.setFormatter(formatter)
-    _logger.addHandler(stream_handler)
-
-    if log_file is None:
-        log_file = f'./{create_name()}.log'
-
-    log_file_folder = os.path.split(log_file)[0]
-    os.makedirs(log_file_folder, exist_ok=True)
-
+    formatter = logging.Formatter('[%(asctime)s] %(name)s %(levelname)s: %(message)s', 
+                                datefmt='%Y/%m/%d %H:%M:%S')
+    
+    # 控制台输出
+    console = logging.StreamHandler(sys.stdout)
+    console.setFormatter(formatter)
+    _logger.addHandler(console)
+    
+    # 文件输出
+    log_file = log_file or f'./{create_name()}.log'
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+    
     file_handler = logging.FileHandler(log_file, encoding='utf8')
     file_handler.setFormatter(formatter)
     _logger.addHandler(file_handler)
+    
     _logger.setLevel(log_level)
-    _logger.warning('Initialize logger')
+    _logger.warning('日志器初始化完成')
 
 
-def info(fmt: str, *args: Any) -> None:
-    """记录信息级别的日志
-
-    Args:
-        fmt: 日志格式字符串
-        *args: 格式化参数
-    """
+def _log(level, fmt, *args):
+    """统一日志记录"""
     if _logger:
-        _logger.info(fmt, *args)
+        getattr(_logger, level)(fmt, *args)
 
 
-def debug(fmt: str, *args: Any) -> None:
-    """记录调试级别的日志
-
-    Args:
-        fmt: 日志格式字符串
-        *args: 格式化参数
-    """
-    if _logger:
-        _logger.debug(fmt, *args)
+def info(fmt, *args):
+    _log('info', fmt, *args)
 
 
-def warning(fmt: str, *args: Any) -> None:
-    """记录警告级别的日志
-
-    Args:
-        fmt: 日志格式字符串
-        *args: 格式化参数
-    """
-    if _logger:
-        _logger.warning(fmt, *args)
+def debug(fmt, *args):
+    _log('debug', fmt, *args)
 
 
-def error(fmt: str, *args: Any) -> None:
-    """记录错误级别的日志
+def warning(fmt, *args):
+    _log('warning', fmt, *args)
 
-    Args:
-        fmt: 日志格式字符串
-        *args: 格式化参数
-    """
-    if _logger:
-        _logger.error(fmt, *args)
+
+def error(fmt, *args):
+    _log('error', fmt, *args)

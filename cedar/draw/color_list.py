@@ -1,12 +1,6 @@
-"""
-color_list: 颜色列表，BGR格式
+# BGR颜色列表，用于OpenCV绘图
 
-可用于OpenCV绘图等场景。
-"""
-
-from typing import List
-
-color_list: List[List[int]] = [
+color_list = [
     [188, 113, 0],
     [24, 82, 216],
     [31, 176, 236],
