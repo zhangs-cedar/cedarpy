@@ -14,3 +14,5 @@ class Plugin1(PluginBase):
         if isinstance(data, dict):
             data['processed_by'] = data.get('processed_by', []) + ['Plugin1']
         return data
+
+

@@ -48,7 +48,7 @@ class PluginManager:
                     module = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(module)
                     
-                    # 查找插件类 - 简化检测逻辑
+                    # 查找插件类
                     for name, obj in inspect.getmembers(module, inspect.isclass):
                         if self._is_plugin_class(obj):
                             self.registered_plugins[name] = obj
@@ -58,7 +58,7 @@ class PluginManager:
     
     def _is_plugin_class(self, cls) -> bool:
         """检查是否为有效插件类"""
-        return (issubclass(cls, PluginBase) and 
+        return (issubclass(cls, PluginBase) and  
                 cls != PluginBase and
                 hasattr(cls, 'execute') and 
                 hasattr(cls, 'init'))
@@ -91,7 +91,6 @@ class PluginManager:
                 if not plugin_name or plugin_name not in self.registered_plugins:
                     print(f"警告: 插件 {plugin_name} 未找到")
                     continue
-                
                 try:
                     plugin_class = self.registered_plugins[plugin_name]
                     plugin_instance = plugin_class(plugin_config)
