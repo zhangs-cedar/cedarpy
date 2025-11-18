@@ -21,4 +21,5 @@ from cedar.utils.tools import (
     copy_file,
     get_files_list,
     get_nested_value,
+    init_cfg
 )
