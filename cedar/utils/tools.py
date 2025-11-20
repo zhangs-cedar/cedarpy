@@ -127,14 +127,19 @@ def move_file(src_path, dst_dir, filename=None):
     shutil.move(src_path, dst_path)
 
 
+
 def copy_file(src_path, dst_dir, filename=None):
-    """复制文件"""
+    """硬链接优先,失败fallback到copy"""
     filename = filename or os.path.basename(src_path)
     os.makedirs(dst_dir, exist_ok=True)
     dst_path = os.path.join(dst_dir, filename)
+
     if os.path.exists(dst_path):
         os.remove(dst_path)
-    shutil.copy(src_path, dst_path)
+    try:
+        os.link(src_path, dst_path)  # 硬链接,零拷贝
+    except (OSError, NotImplementedError):
+        shutil.copy2(src_path, dst_path)  # 跨分区或不支持时用copy
 
 
 def get_files_list(input_path, find_suffix=None, sortby='name'):
