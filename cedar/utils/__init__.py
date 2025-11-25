@@ -3,10 +3,7 @@
 提供配置管理、日志、文件操作等实用工具
 """
 
-from cedar.utils.config import Config
-from cedar.utils.dict2obj import Dict2Obj
-from cedar.utils import logger
-from cedar.utils.logger import init_logger
+from cedar.utils.config import load_config, write_config
 from cedar.utils.s_print import print
 from cedar.utils.tools import (
     rmtree_makedirs,
