@@ -46,37 +46,28 @@ if __name__ == '__main__':
     # 读取配置示例
     config = load_config()
     print('读取配置:', config)
-    
+
     # 写入配置示例
-    test_data = {
-        'app': {
-            'name': 'CedarPy',
-            'version': '1.0.0'
-        },
-        'database': {
-            'host': 'localhost',
-            'port': 3306
-        }
-    }
-    
+    test_data = {'app': {'name': 'CedarPy', 'version': '1.0.0'}, 'database': {'host': 'localhost', 'port': 3306}}
+
     # 写入 YAML 格式
     write_config(test_data, 'test_config.yaml')
     print('已写入: test_config.yaml')
-    
+
     # 写入 JSON 格式（标准 JSON）
     write_config(test_data, 'test_config.json')
     print('已写入: test_config.json')
-    
+
     # 写入 JSON5 格式
     write_config(test_data, 'test_config.json5')
     print('已写入: test_config.json5')
-    
+
     # 验证写入的文件
     loaded_yaml = load_config('test_config.yaml')
     print('验证 YAML:', loaded_yaml)
-    
+
     loaded_json = load_config('test_config.json')
     print('验证 JSON:', loaded_json)
-    
+
     loaded_json5 = load_config('test_config.json5')
     print('验证 JSON5:', loaded_json5)
