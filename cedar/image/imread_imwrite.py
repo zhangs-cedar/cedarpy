@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 
@@ -20,5 +21,6 @@ def imwrite(image_path, img, plt=False):
     if plt:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+    os.makedirs(os.path.dirname(image_path), exist_ok=True)
     suffix = split_filename(image_path)[1]
     cv2.imencode(suffix, img)[1].tofile(image_path)
