@@ -1,12 +1,12 @@
-numpy>=1.19
-scipy>=1.5
+numpy
+scipy
 pillow
 matplotlib
 pandas
 scikit-learn
 tqdm
 black
-opencv-python>=4.5.0
+opencv-python
 natsort
 json5
 pyyaml
