@@ -18,7 +18,10 @@ from cedar.utils.s_print import print
 def init_cfg(config_file_path, file=None):
     """初始化配置"""
     file = file or __file__
-    config_file_path = config_file_path or os.environ.get('SCRIPT_CONFIG_FILE') or (sys.argv[1] if len(sys.argv) > 1 else None)
+    if not config_file_path:
+        config_file_path = os.environ.get('SCRIPT_CONFIG_FILE')
+    if not config_file_path and len(sys.argv) > 1:
+        config_file_path = sys.argv[1]
     if not config_file_path:
         raise ValueError('未提供配置文件路径')
 
@@ -26,7 +29,7 @@ def init_cfg(config_file_path, file=None):
     script_name = osp.basename(osp.dirname(file))
     log_dir = osp.join(base_dir, 'log', script_name)
     os.makedirs(log_dir, exist_ok=True)
-    os.environ['LOG_PATH'] = osp.join(log_dir, create_name() + '.log')
+    os.environ['LOG_PATH'] = osp.join(log_dir, f'{create_name()}.log')
 
     with open(config_file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
@@ -70,9 +73,9 @@ def timeit(func):
         start = time.time()
         try:
             res = func(*args, **kwargs)
-            print('[Method {}], FINISH Time {} s: \n'.format(func.__name__, round((time.time() - start), 4)))
+            print(f'[Method {func.__name__}], FINISH Time {round(time.time() - start, 4)} s: \n')
             return res
-        except Exception as e:
+        except Exception:
             print(str(traceback.format_exc()).split('func(*args, **kwargs)')[-1].split('decorated')[0])
             raise
 
@@ -84,7 +87,7 @@ def try_except(func):
     def decorated(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except Exception as e:
+        except Exception:
             print(str(traceback.format_exc()).split('func(*args, **kwargs)')[-1].split('decorated')[0])
             raise
 
@@ -93,7 +96,7 @@ def try_except(func):
 
 def run_subprocess(cmd, cwd=None):
     """执行子进程"""
-    cwd = cwd or os.path.dirname(os.path.abspath(__file__))
+    cwd = cwd or osp.dirname(osp.abspath(__file__))
     process = subprocess.Popen(cmd, cwd=cwd, shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     stdout, stderr = process.communicate()
     return process, stdout, stderr
@@ -119,21 +122,21 @@ def find_duplicate_filenames(directory):
 
 def move_file(src_path, dst_dir, filename=None):
     """移动文件"""
-    filename = filename or os.path.basename(src_path)
+    filename = filename or osp.basename(src_path)
     os.makedirs(dst_dir, exist_ok=True)
-    dst_path = os.path.join(dst_dir, filename)
-    if os.path.exists(dst_path):
+    dst_path = osp.join(dst_dir, filename)
+    if osp.exists(dst_path):
         os.remove(dst_path)
     shutil.move(src_path, dst_path)
 
 
 def copy_file(src_path, dst_dir, filename=None):
     """硬链接优先,失败fallback到copy"""
-    filename = filename or os.path.basename(src_path)
+    filename = filename or osp.basename(src_path)
     os.makedirs(dst_dir, exist_ok=True)
-    dst_path = os.path.join(dst_dir, filename)
+    dst_path = osp.join(dst_dir, filename)
 
-    if os.path.exists(dst_path):
+    if osp.exists(dst_path):
         os.remove(dst_path)
     try:
         os.link(src_path, dst_path)  # 硬链接,零拷贝
@@ -176,7 +179,7 @@ def get_files_list(input_path, find_suffix=None, sortby='name'):
     return natsort.natsorted(files_list, key=lambda x: x[sortby])
 
 
-def get_nested_value(d: dict, *keys: str, default: Any = None) -> Any:
+def get_nested_value(d: dict, *keys, default: Any = None) -> Any:
     """从嵌套字典获取值"""
     for key in keys:
         if isinstance(d, dict) and key in d:

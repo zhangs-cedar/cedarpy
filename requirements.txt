@@ -8,3 +8,5 @@ tqdm
 black
 opencv-python>=4.5.0
 natsort
+json5
+pyyaml

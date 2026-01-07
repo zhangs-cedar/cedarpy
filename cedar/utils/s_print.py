@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 LOG_FILE = os.path.join(os.path.dirname(__file__), 's_print.log')
 
@@ -47,7 +47,7 @@ def format_arg(arg: Any) -> tuple:
 original_print = print
 
 
-def print(*args: Any, sep: str = ' ', end: str = '\n', file: Optional[str] = None) -> str:
+def print(*args: Any, sep: str = ' ', end: str = '\n', file: str = None) -> str:
     """带颜色和日志的打印函数"""
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     prefix = f'[{timestamp}]   '
