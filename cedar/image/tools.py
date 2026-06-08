@@ -11,6 +11,7 @@ from PIL import Image
 
 # ==================== 图像读写 ====================
 
+
 def imread(image_path, flag=cv2.IMREAD_COLOR):
     """读取图片，支持中文路径"""
     img = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), flag)
@@ -33,6 +34,7 @@ def imwrite(image_path, img, plt=False):
 
 
 # ==================== 图像变换 ====================
+
 
 def rotate_image(img, angle, border_value=(0, 0, 0)):
     """对图像进行旋转操作
@@ -63,10 +65,11 @@ def rotate_image(img, angle, border_value=(0, 0, 0)):
     rotated = cv2.warpAffine(img, M, (nw, nh), flags=cv2.INTER_NEAREST, borderValue=border_value)
 
     pw, ph = (nw - w) // 2, (nh - h) // 2
-    return rotated[ph:ph + h, pw:pw + w]
+    return rotated[ph : ph + h, pw : pw + w]
 
 
 # ==================== 轮廓处理 ====================
+
 
 def get_contours(mask):
     """获取掩码图像的轮廓"""
@@ -80,6 +83,7 @@ def get_minAreaRect(cnt):
 
 
 # ==================== 向量计算 ====================
+
 
 def get_vector(point1, point2):
     """根据两个点计算向量（y轴向上为正）"""
@@ -116,6 +120,7 @@ def calcu_angle(v1):
 
 
 # ==================== IoU 计算 ====================
+
 
 def calculate_iou(box1, box2):
     """计算两个矩形框之间的交并比(IoU)，格式为(x, y, w, h)"""
@@ -166,6 +171,7 @@ def merge_boxes(boxes, iou_threshold):
 
 
 # ==================== 路径/格式转换 ====================
+
 
 def find_image_path(file_path, name, extensions=None):
     """在给定文件路径的同一目录下查找图片文件"""

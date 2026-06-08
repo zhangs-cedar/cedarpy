@@ -49,10 +49,7 @@ if __name__ == '__main__':
     print('读取配置:', config)
 
     # 写入配置示例
-    test_data = {
-        'app': {'name': 'CedarPy', 'version': '1.0.0'},
-        'database': {'host': 'localhost', 'port': 3306}
-    }
+    test_data = {'app': {'name': 'CedarPy', 'version': '1.0.0'}, 'database': {'host': 'localhost', 'port': 3306}}
 
     # 写入 YAML 格式
     write_config(test_data, 'test_config.yaml')
